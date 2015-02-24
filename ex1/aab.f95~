@@ -1,0 +1,14 @@
+      PROGRAM MYPROG
+
+      REAL X
+      DO
+         WRITE(*,*) 'Gi inn et tall (0 avslutter):' 
+         READ(*,*)  A
+         READ(*,*)  B
+         READ(*,*)  N
+         IF ( X .EQ. 0 ) EXIT
+         WRITE(*,*) 'Tallet er ...........: ', X 
+         WRITE(*,*) 'Tallet kvaårert er ..: ', X**2 
+         WRITE(*,*) 'Roten av tallet er ..: ', SQRT(X) 
+      END DO
+      END
