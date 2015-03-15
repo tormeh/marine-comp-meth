@@ -1,17 +1,47 @@
+      
+      
+      
+      
+      FUNCTION BOUNDARY(X,Y)
+        INTEGER :: X
+        INTEGER :: Y
+        BOUNDARY = (1/4.0)*(X*X*H*H+Y*Y*H*H)
+        RETURN
+      END FUNCTION
+      
+      
+      
+      FUNCTION F(X,Y)
+        INTEGER X,Y
+        F=1.0
+        RETURN
+      END FUNCTION
+      
+      
+      FUNCTION NEWESTIMATE(X,Y,H)
+        INTEGER X,Y
+        REAL H
+        NEWESTIMATE = (1/4.0)*(PHI(X+1,Y)+PHI(X,Y+H)+PHI(X-H,Y)+PHI(X,Y-H)-H*H*F(X,Y))
+        RETURN
+      END FUNCTION
+      
+      FUNCTION SOLVE(LENGTH)
+        INTEGER :: LENGTH
+      END FUNCTION
+      
       PROGRAM SOLVER
-
-      REAL X
-      DO
-         WRITE(*,*) 'Gi inn et tall (0 avslutter):' 
-         READ(*,*)  A
-         READ(*,*)  B
-         READ(*,*)  N
-         REAL, DIMENSION(N) :: ARR
-         DO 10 I = 1, N
-         ARR(I) = 
-10       CONTINUE
-         WRITE(*,*) 'Tallet er ...........: ', X 
-         WRITE(*,*) 'Tallet kvaårert er ..: ', X**2 
-         WRITE(*,*) 'Roten av tallet er ..: ', SQRT(X) 
-      END DO
+        REAL :: H = 0.1
+        INTEGER :: LENGTH
+        REAL :: PHIS(LENGTH, LENGTH)
+        LENGTH = (1.0/H)+1
+        
+        DO I=1,LENGTH
+          DO J=1,LENGTH
+              IF (I==1 .OR. I==LENGTH .OR. J==1 .OR. j==LENGTH) THEN
+                PHIS(I,J) = BOUNDARY(I,J)
+              ELSE
+                PHIS(I,J) = NEWESTIMATE(X,Y,H)
+              END IF
+          END DO
+        END DO
       END
