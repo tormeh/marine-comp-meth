@@ -54,7 +54,7 @@
                   PHIS(I,J) = BOUNDARY(I,J,H)
                 ELSE
                   NEWVALUE = NEWESTIMATE(I,J,H,PHIS,LENGTH)
-                  AVGCHANGE = AVGCHANGE + (NEWVALUE-PHIS(I,J))/PHISSIZE
+                  AVGCHANGE = AVGCHANGE + ABS(NEWVALUE-PHIS(I,J))/PHISSIZE
                   PHIS(I,J) = NEWVALUE
                 END IF
             END DO
