@@ -2,27 +2,36 @@
       
       
       
-      FUNCTION BOUNDARY(X,Y,H)
+      FUNCTION BOUNDARY(X,Y,H,PHIS,LENGTH)
         INTEGER :: X
         INTEGER :: Y
         REAL :: H
-        BOUNDARY = (1/4.0)*(X*X*H*H+Y*Y*H*H)
+        REAL :: PHIS(LENGTH,LENGTH)
+        IF (X==0 .AND. Y==0) THEN
+          BOUNDARY=0
+        ELSE IF (X==0 .AND. Y==LENGTH) THEN
+          BOUNDARY = NEWESTIMATE(X,Y,H,PHIS,LENGTH)
+        ELSE IF (X==LENGTH .AND. Y==0) THEN
+          BOUNDARY = NEWESTIMATE(X,Y,H,PHIS,LENGTH)
+        ELSE IF (X==LENGTH .AND. Y==LENGTH) THEN
+          BOUNDARY = NEWESTIMATE(X,Y,H,PHIS,LENGTH)
+        ELSE IF (X==0) THEN
+          BOUNDARY = PHIS(1,Y)
+        ELSE IF (X==LENGTH) THEN
+          BOUNDARY = PHIS(LENGTH-1,Y)
+        ELSE IF (Y==0) THEN
+          BOUNDARY = PHIS(X,1)
+        ELSE IF (Y==LENGTH) THEN
+          BOUNDARY = PHIS(X,LENGTH-1)
+        END IF
         RETURN
       END FUNCTION
       
-      
-      
-      FUNCTION F1(X,Y,H)
-        INTEGER X,Y
-        REAL H
-        F1=12-12*X*H-12*Y*H
-        RETURN
-      END FUNCTION
       
       FUNCTION F2(X,Y,H)
         INTEGER X,Y
         REAL H
-        F2=(6-12*X*H)*(3*Y*Y*H*H-2*Y*Y*Y*H*H*H) + (3X*X*H*H-2*X*X*X*H*H*H)*(6-12*Y*H)
+        F2=(6-12*X*H)*(3*Y*Y*H*H-2*Y*Y*Y*H*H*H) + (3*X*X*H*H-2*X*X*X*H*H*H)*(6-12*Y*H)
         RETURN
       END FUNCTION      
       
@@ -31,13 +40,10 @@
         INTEGER X,Y
         REAL H
         REAL :: PHIS(LENGTH,LENGTH)
-        NEWESTIMATE = (1/4.0)*(PHIS(X+1,Y)+PHIS(X,Y+1)+PHIS(X-1,Y)+PHIS(X,Y-1)-H*H*F(X,Y))
+        NEWESTIMATE = (1/4.0)*(PHIS(X+1,Y)+PHIS(X,Y+1)+PHIS(X-1,Y)+PHIS(X,Y-1)-H*H*F2(X,Y,H))
         RETURN
       END FUNCTION
       
-      FUNCTION SOLVE(LENGTH)
-        INTEGER :: LENGTH
-      END FUNCTION
       
       PROGRAM SOLVER
         PARAMETER (H = 0.1)
@@ -50,7 +56,7 @@
         
         DO I=1,LENGTH
           DO J=1,LENGTH
-            PHIS(I,J) = BOUNDARY(I,J,H)
+            PHIS(I,J) = BOUNDARY(I,J,H,PHIS,LENGTH)
           END DO
         END DO
         
@@ -59,7 +65,7 @@
           DO I=1,LENGTH
             DO J=1,LENGTH
                 IF (I==1 .OR. I==LENGTH .OR. J==1 .OR. j==LENGTH) THEN
-                  PHIS(I,J) = BOUNDARY(I,J,H)
+                  PHIS(I,J) = BOUNDARY(I,J,H,PHIS,LENGTH)
                 ELSE
                   NEWVALUE = NEWESTIMATE(I,J,H,PHIS,LENGTH)
                   AVGCHANGE = AVGCHANGE + ABS(NEWVALUE-PHIS(I,J))/PHISSIZE
