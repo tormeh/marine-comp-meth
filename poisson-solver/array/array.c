@@ -15,6 +15,9 @@
 #include "glut_wrap.h"
 #include "shaderutil.h"
 
+#define LENGTH 11
+float inm[LENGTH*LENGTH];
+
 
 /**
  * The vertex position.z is used as a (variable) index into an
@@ -64,20 +67,56 @@ fz(float x, float y)
    return fabs(cos(1.5*x) + cos(1.5*y));
 }
 
+static float
+getinm(float x, float y, float minx, float maxx, float miny, float maxy)
+{
+  int i = ((x+(-minx))/(maxx-minx))*LENGTH;
+  int j = ((y+(-miny))/(maxy-miny))*LENGTH;
+  int index = i*LENGTH+j;
+  if(index<0){index=0;}
+  if(index>LENGTH*LENGTH){index=LENGTH*LENGTH-1;}
+  printf("x is %f, y is %f, i is %d, j is %d, index is %d\n",x,y,i,j,index);
+  return inm[index];
+}
+
 
 static void
 DrawMesh(void)
 {
    GLfloat xmin = -2.0, xmax = 2.0;
    GLfloat ymin = -2.0, ymax = 2.0;
-   GLuint xdivs = 20, ydivs = 20;
+   GLuint xdivs = 40, ydivs = 40;
    GLfloat dx = (xmax - xmin) / xdivs;
    GLfloat dy = (ymax - ymin) / ydivs;
    GLfloat ds = 1.0 / xdivs, dt = 1.0 / ydivs;
    GLfloat x, y, s, t;
    GLuint i, j;
 
+   float scale = 3.0;
+   
    y = ymin;
+   t = 0.0;
+   for (i = 0; i < ydivs; i++) {
+      x = xmin;
+      s = 0.0;
+      glBegin(GL_QUAD_STRIP);
+      for (j = 0; j < xdivs; j++) {
+         float z0 = scale*getinm(x, y, xmin,xmax,ymin,ymax), z1 = scale*getinm(x, y + dy, xmin,xmax,ymin,ymax);
+
+         glTexCoord2f(s, t);
+         glVertex3f(x, y, z0);
+
+         glTexCoord2f(s, t + dt);
+         glVertex3f(x, y + dy, z1);
+         x += dx;
+         s += ds;
+      }
+      glEnd();
+      y += dy;
+      t += dt;
+   }
+   
+   /*y = ymin;
    t = 0.0;
    for (i = 0; i < ydivs; i++) {
       x = xmin;
@@ -97,7 +136,7 @@ DrawMesh(void)
       glEnd();
       y += dy;
       t += dt;
-   }
+   }*/
 }
 
 
@@ -242,6 +281,24 @@ Init(void)
 int
 main(int argc, char *argv[])
 {
+  float in = 0.0;
+  
+  FILE *f = fopen("results.txt", "r");
+  for(int i=0; i<LENGTH*LENGTH; i++)
+  {
+    fscanf(f,"%f",&in);
+    inm[i] = in;
+    //printf("%f\n", in);
+  }
+  fclose(f);
+  
+  
+
+
+    /**
+    * Start OpenGL stuff
+    */
+
    glutInit(&argc, argv);
    glutInitWindowSize(500, 500);
    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);

@@ -46,7 +46,7 @@
           END DO
         END DO
         
-        DO WHILE (AVGCHANGE > 0.001)
+        DO WHILE (AVGCHANGE > 0.00001)
           AVGCHANGE = 0.0
           DO I=1,LENGTH
             DO J=1,LENGTH
@@ -64,7 +64,7 @@
         open (unit=out_unit,file="results.txt",action="write",status="replace")
         DO I=1,LENGTH
           DO J=1,LENGTH
-              WRITE (OUT_UNIT,*) PHIS(I,J)
+              WRITE (OUT_UNIT,'(F10.5)') PHIS(I,J)
           END DO
         END DO
         close (out_unit)
