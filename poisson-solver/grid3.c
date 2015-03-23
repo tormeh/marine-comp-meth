@@ -39,6 +39,8 @@ int main () {
 
   /* OTHER STUFF GOES HERE NEXT */
   
+  sleep(10);
+  
   // close GL context and any other GLFW resources
   glfwTerminate();
   return 0;
