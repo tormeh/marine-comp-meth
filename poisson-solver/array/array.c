@@ -17,7 +17,9 @@
 
 #define LENGTH 11
 float inm[LENGTH*LENGTH];
-
+#define GLmaxdiff 2.0
+float highest = 0.0;
+float lowest = 0.0;
 
 /**
  * The vertex position.z is used as a (variable) index into an
@@ -92,7 +94,7 @@ DrawMesh(void)
    GLfloat x, y, s, t;
    GLuint i, j;
 
-   float scale = 3.0;
+   float scale = GLmaxdiff/(highest-lowest);
    
    y = ymin;
    t = 0.0;
@@ -281,17 +283,27 @@ Init(void)
 int
 main(int argc, char *argv[])
 {
+  srand(time(NULL));
   float in = 0.0;
+  
   
   FILE *f = fopen("results.txt", "r");
   for(int i=0; i<LENGTH*LENGTH; i++)
   {
     fscanf(f,"%f",&in);
     inm[i] = in;
+    //inm[i] = rand()%GLmaxdiff;
+    if (in < lowest)
+    {
+      lowest = in;
+    } 
+    else if (in > highest)
+    {
+      highest = in;
+    }
     //printf("%f\n", in);
   }
   fclose(f);
-  
   
 
 
