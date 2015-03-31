@@ -87,7 +87,7 @@ DrawMesh(void)
 {
    GLfloat xmin = -2.0, xmax = 2.0;
    GLfloat ymin = -2.0, ymax = 2.0;
-   GLuint xdivs = 40, ydivs = 40;
+   GLuint xdivs = 60, ydivs = 60;
    GLfloat dx = (xmax - xmin) / xdivs;
    GLfloat dy = (ymax - ymin) / ydivs;
    GLfloat ds = 1.0 / xdivs, dt = 1.0 / ydivs;
