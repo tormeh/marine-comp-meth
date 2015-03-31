@@ -104,7 +104,7 @@
         
         DO I=1,LENGTH
           DO J=1,LENGTH
-            PHIS(I,J) = RAND(0)
+            PHIS(I,J) = RAND(0)*10
           END DO
         END DO
         
