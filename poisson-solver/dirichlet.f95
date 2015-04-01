@@ -29,9 +29,9 @@
         INTEGER LENGTH
         REAL F
         REAL :: PHIS(LENGTH,LENGTH)
-        WRITE (*,'(a,g12.4)') "F-PART IS ", H*H*F(X,Y,H)
+        !WRITE (*,'(a,g12.4)') "F-PART IS ", H*H*F(X,Y,H)
         NEWESTIMATE = (1.0/4.0)*(PHIS(X+1,Y)+PHIS(X,Y+1)+PHIS(X-1,Y)+PHIS(X,Y-1)-H*H*F(X,Y,H))
-        WRITE (*,'(a,g12.4)') "NEWESTIMATE IS ", NEWESTIMATE
+        !WRITE (*,'(a,g12.4)') "NEWESTIMATE IS ", NEWESTIMATE
         RETURN
       END FUNCTION
       
@@ -77,6 +77,8 @@
         REAL AVGCHANGE
         REAL LOWAVGCHANGE
         REAL LOWCHANGE
+        REAL AVGERROR
+        INTEGER NUMITERATIONS
         LOWAVGCHANGE = 20.0
         AVGCHANGE = 1.0
         LOWHIGHESTCHANGE = 20.0
@@ -88,7 +90,9 @@
           END DO
         END DO
         
+        NUMITERATIONS = 0
         DO WHILE ((LOWHIGHESTCHANGE/HIGHESTCHANGE) > 1.0 .OR. (LOWAVGCHANGE/AVGCHANGE) > 1.0)
+          NUMITERATIONS = NUMITERATIONS + 1
           LOWAVGCHANGE = LOWCHANGE(LOWAVGCHANGE, AVGCHANGE)
           LOWHIGHESTCHANGE = LOWCHANGE(LOWHIGHESTCHANGE, HIGHESTCHANGE)
           HIGHESTCHANGE = 0.0
@@ -102,12 +106,26 @@
                 END IF
                 HIGHESTCHANGE = HIGHESTCHANGEFUN(PHIS(I,J),NEWVALUE,HIGHESTCHANGE)
                 AVGCHANGE = AVGCHANGE + ABS(PHIS(I,J)-NEWVALUE)/SIZE
-                WRITE (*,*) "OLD VALUE IS ", PHIS(I,J)
+                !WRITE (*,*) "OLD VALUE IS ", PHIS(I,J)
                 PHIS(I,J) = NEWVALUE
-                WRITE (*,*) "NEW VALUE IS ", PHIS(I,J)
+                !WRITE (*,*) "NEW VALUE IS ", PHIS(I,J)
             END DO
           END DO
         END DO
+        
+        WRITE (*,*) "NUMITERATIONS IS ", NUMITERATIONS
+        
+        AVGERROR = 0.0
+        DO I=1,LENGTH
+          DO J=1,LENGTH
+          IF (I==1 .OR. I==LENGTH .OR. J==1 .OR. J==LENGTH) THEN
+            AVGERROR = AVGERROR + ABS(PHIS(I,J)-BOUNDARY(I,J,H))/SIZE
+          ELSE
+            AVGERROR = AVGERROR + ABS(PHIS(I,J)-NEWESTIMATE(I,J,H,PHIS,LENGTH))/SIZE
+          END IF
+          END DO
+        END DO
+        WRITE (*,*) "AVGERROR IS ", AVGERROR
         
         open (unit=out_unit,file="results.txt",action="write",status="replace")
         DO I=1,LENGTH
