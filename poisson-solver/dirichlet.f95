@@ -3,6 +3,7 @@
       
       
       FUNCTION BOUNDARY(X,Y,H)
+        !computes the value of (x*h,y*h). Valid only on the boundary.
         REAL BOUNDARY
         INTEGER :: X
         INTEGER :: Y
@@ -14,6 +15,7 @@
       
       
       FUNCTION F(X,Y,H)
+        !the right side of the poisson equation
         REAL F
         INTEGER X,Y
         REAL H
@@ -23,6 +25,7 @@
       
       
        FUNCTION NEWESTIMATE(X,Y,H,PHIS,LENGTH)
+        !computes a new estimate for the value of (x*h,y*h). Not valid on the boundary
         INTEGER X,Y
         REAL H
         REAL NEWESTIMATE
@@ -36,6 +39,7 @@
       END FUNCTION
       
       FUNCTION HIGHESTCHANGEFUN(OLD,NEW,PREVHIGHEST)
+        !returns the gighest change in (phi-)value given a new old value, new assignment and the previous highest change
         REAL :: OLD
         REAL :: NEW
         REAL :: PREVHIGHEST
@@ -51,6 +55,7 @@
       END FUNCTION
       
       FUNCTION LOWCHANGE(OLDLOWEST, LASTLOW)
+        !returns the lesser of two variables. Intended to compare change magnitudes to determine the lowest one.
         REAL LOWCHANGE
         REAL OLDLOWEST
         REAL LASTLOW
@@ -84,12 +89,15 @@
         LOWHIGHESTCHANGE = 20.0
         HIGHESTCHANGE = 10.0
         
+        !random initialization
         DO I=1,LENGTH
           DO J=1,LENGTH
             PHIS(I,J) = RAND(0)*10
           END DO
         END DO
         
+        !the computation loop. Computes the average change of phi and the highest change of phi. 
+        !Remembers the lowest such values for any iteration. Terminates if both the average and highest change is higher than the historical lows.
         NUMITERATIONS = 0
         DO WHILE ((LOWHIGHESTCHANGE/HIGHESTCHANGE) > 1.0 .OR. (LOWAVGCHANGE/AVGCHANGE) > 1.0)
           NUMITERATIONS = NUMITERATIONS + 1
@@ -113,8 +121,8 @@
           END DO
         END DO
         
+        !performance metrics number of iterations needed to compute result and the end average absolute error is printed 
         WRITE (*,*) "NUMITERATIONS IS ", NUMITERATIONS
-        
         AVGERROR = 0.0
         DO I=1,LENGTH
           DO J=1,LENGTH
@@ -127,6 +135,7 @@
         END DO
         WRITE (*,*) "AVGERROR IS ", AVGERROR
         
+        !write to file
         open (unit=out_unit,file="results.txt",action="write",status="replace")
         DO I=1,LENGTH
           DO J=1,LENGTH
