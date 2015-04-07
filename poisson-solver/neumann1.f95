@@ -3,7 +3,8 @@
         INTEGER X,Y
         REAL H
         REAL F1
-        F1=12-12*X*H-12*Y*H
+        !F1=12-12*X*H-12*Y*H
+        F1=(6-12*X*H)*(3*Y*Y*H*H-2*Y*Y*Y*H*H*H) + (3*X*X*H*H-2*X*X*X*H*H*H)*(6-12*Y*H)
         RETURN
       END FUNCTION
            
@@ -93,6 +94,42 @@
         END IF
         RETURN
       END FUNCTION
+      
+      FUNCTION BOUNDARYNEIGHBOR(X,Y,H,PHIS,LENGTH)
+        INTEGER X
+        INTEGER  Y
+        REAL H
+        INTEGER LENGTH
+        REAL NEWVALUE
+        REAL :: PHIS(LENGTH,LENGTH)
+        REAL BOUNDARYNEIGHBOR
+        REAL NEWESTIMATE
+        REAL F1
+        IF (X==2 .AND. Y==2) THEN
+          BOUNDARYNEIGHBOR = (1.0/2.0)*(PHIS(X,Y+1)+PHIS(X+1,Y)-H*H*F1(X,Y,H))
+        ELSE IF (X==2 .AND. Y==LENGTH-1) THEN
+          BOUNDARYNEIGHBOR = (1.0/2.0)*(PHIS(X+1,Y)+PHIS(X,Y-1)-H*H*F1(X,Y,H))
+        ELSE IF (X==LENGTH-1 .AND. Y==2) THEN
+          BOUNDARYNEIGHBOR = (1.0/2.0)*(PHIS(X,Y+1)+PHIS(X+1,Y)-H*H*F1(X,Y,H))
+        ELSE IF (X==LENGTH-1 .AND. Y==LENGTH-1) THEN
+          BOUNDARYNEIGHBOR = (1.0/2.0)*(PHIS(X-1,Y)+PHIS(X,Y-1)-H*H*F1(X,Y,H))
+        ELSE IF (X==2) THEN
+          NEWVALUE = (1.0/3.0)*(PHIS(X,Y+1)+PHIS(X,Y-1)+PHIS(X+1,Y)-H*H*F1(X,Y,H))
+          BOUNDARYNEIGHBOR = NEWVALUE
+        ELSE IF (X==LENGTH-1) THEN
+          NEWVALUE = (1.0/3.0)*(PHIS(X,Y+1)+PHIS(X,Y-1)+PHIS(X-1,Y)-H*H*F1(X,Y,H))
+          BOUNDARYNEIGHBOR = NEWVALUE
+        ELSE IF (Y==2) THEN
+          NEWVALUE = (1.0/3.0)*(PHIS(X+1,Y)+PHIS(X-1,Y)+PHIS(X,Y+1)-H*H*F1(X,Y,H))
+          BOUNDARYNEIGHBOR = NEWVALUE
+        ELSE IF (Y==LENGTH-1) THEN
+          NEWVALUE = (1.0/3.0)*(PHIS(X+1,Y)+PHIS(X-1,Y)+PHIS(X,Y-1)-H*H*F1(X,Y,H))
+          BOUNDARYNEIGHBOR = NEWVALUE
+        ELSE
+          BOUNDARYNEIGHBOR = NEWESTIMATE(X,Y,H,PHIS,LENGTH)
+        END IF
+        RETURN
+      END FUNCTION
            
       
       FUNCTION NEWESTIMATE(X,Y,H,PHIS,LENGTH)
@@ -145,6 +182,7 @@
         REAL NEWESTIMATE
         REAL BOUNDARY
         REAL BOUNDARYPURE
+        REAL BOUNDARYNEIGHBOR
         INTEGER I,J
         REAL HIGHESTCHANGEFUN
         REAL LOWHIGHESTCHANGE
@@ -175,6 +213,8 @@
             DO J=1,LENGTH
                 IF (I==1 .OR. I==LENGTH .OR. J==1 .OR. J==LENGTH) THEN
                   NEWVALUE = BOUNDARY(I,J,H,PHIS,LENGTH)
+                !ELSE IF (I==2 .OR. I==LENGTH-1 .OR. J==2 .OR. J==LENGTH-1) THEN
+                  !NEWVALUE = BOUNDARYNEIGHBOR(I,J,H,PHIS,LENGTH)
                 ELSE
                   NEWVALUE = NEWESTIMATE(I,J,H,PHIS,LENGTH)
                 END IF
@@ -186,6 +226,8 @@
             END DO
           END DO
         END DO
+        
+        
         
         WRITE (*,*) "NUMITERATIONS IS ", NUMITERATIONS
         
