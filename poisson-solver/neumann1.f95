@@ -1,10 +1,11 @@
+!gfortran neumann1.f95 -fimplicit-none -O3
       
       FUNCTION F1(X,Y,H)
         INTEGER X,Y
         REAL H
         REAL F1
-        !F1=12-12*X*H-12*Y*H
-        F1=(6-12*X*H)*(3*Y*Y*H*H-2*Y*Y*Y*H*H*H) + (3*X*X*H*H-2*X*X*X*H*H*H)*(6-12*Y*H)
+        F1=12-12*X*H-12*Y*H
+        !F1=(6-12*X*H)*(3*Y*Y*H*H-2*Y*Y*Y*H*H*H) + (3*X*X*H*H-2*X*X*X*H*H*H)*(6-12*Y*H)
         RETURN
       END FUNCTION
            
@@ -172,7 +173,7 @@
       END FUNCTION
       
       PROGRAM SOLVER
-        REAL, PARAMETER :: H = 0.1
+        REAL, PARAMETER :: H = 0.003
         INTEGER, PARAMETER :: LENGTH = (1.0/H)+1
         INTEGER, PARAMETER :: SIZE = LENGTH*LENGTH
         REAL :: PHIS(LENGTH, LENGTH)
@@ -220,9 +221,7 @@
                 END IF
                 HIGHESTCHANGE = HIGHESTCHANGEFUN(PHIS(I,J),NEWVALUE,HIGHESTCHANGE)
                 AVGCHANGE = AVGCHANGE + ABS(PHIS(I,J)-NEWVALUE)/SIZE
-                !WRITE (*,*) "OLD VALUE IS ", PHIS(I,J)
                 PHIS(I,J) = NEWVALUE
-                !WRITE (*,*) "NEW VALUE IS ", PHIS(I,J)
             END DO
           END DO
         END DO
@@ -244,6 +243,8 @@
         WRITE (*,*) "AVGERROR IS ", AVGERROR
         
         open (unit=out_unit,file="results.txt",action="write",status="replace")
+        WRITE (OUT_UNIT,'(I3)') LENGTH
+        WRITE (OUT_UNIT,'(I3)') LENGTH
         DO I=1,LENGTH
           DO J=1,LENGTH
               WRITE (OUT_UNIT,'(F10.5)') PHIS(I,J)

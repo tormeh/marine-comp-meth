@@ -134,7 +134,7 @@
       END FUNCTION
       
       PROGRAM SOLVER
-        REAL, PARAMETER :: H = 0.1
+        REAL, PARAMETER :: H = 0.003
         INTEGER, PARAMETER :: LENGTH = (1.0/H)+1
         INTEGER, PARAMETER :: SIZE = LENGTH*LENGTH
         REAL :: PHIS(LENGTH, LENGTH)
@@ -201,6 +201,8 @@
         WRITE (*,*) "AVGERROR IS ", AVGERROR
         
         open (unit=out_unit,file="results.txt",action="write",status="replace")
+        WRITE (OUT_UNIT,'(I3)') LENGTH
+        WRITE (OUT_UNIT,'(I3)') LENGTH
         DO I=1,LENGTH
           DO J=1,LENGTH
               WRITE (OUT_UNIT,'(F20.5)') PHIS(I,J)

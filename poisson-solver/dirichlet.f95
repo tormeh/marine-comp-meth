@@ -1,4 +1,4 @@
-      
+!gfortran dirichlet.f95 -fimplicit-none -O3 -o dirichlet && ./dirichlet 
       
       
       
@@ -67,7 +67,7 @@
       END FUNCTION
       
       PROGRAM SOLVER
-        REAL, PARAMETER :: H = 0.1
+        REAL, PARAMETER :: H = 0.003
         INTEGER, PARAMETER :: LENGTH = (1.0/H)+1
         INTEGER, PARAMETER :: SIZE = LENGTH*LENGTH
         REAL :: PHIS(LENGTH, LENGTH)
@@ -137,9 +137,11 @@
         
         !write to file
         open (unit=out_unit,file="results.txt",action="write",status="replace")
+        WRITE (OUT_UNIT,'(I3)') LENGTH
+        WRITE (OUT_UNIT,'(I3)') LENGTH
         DO I=1,LENGTH
           DO J=1,LENGTH
-              WRITE (OUT_UNIT,'(F0.5)') PHIS(I,J)
+              WRITE (OUT_UNIT,'(F10.5)') PHIS(I,J)
           END DO
         END DO
         close (out_unit)

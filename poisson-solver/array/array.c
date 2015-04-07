@@ -1,4 +1,4 @@
-//clang -o array array.c shaderutil.c -lGL -lglut -lm -lGLEW && ./array
+//clang -o array array.c shaderutil.c -lGL -lglut -lm -lGLEW -O3 && ./array
 
 /**
  * Test variable array indexing in a vertex shader.
@@ -15,8 +15,8 @@
 #include "glut_wrap.h"
 #include "shaderutil.h"
 
-#define LENGTH 11
-float inm[LENGTH*LENGTH];
+int LENGTH;
+float *inm;
 #define GLmaxdiff 2.0
 float highest = 0.0;
 float lowest = 0.0;
@@ -77,7 +77,7 @@ getinm(float x, float y, float minx, float maxx, float miny, float maxy)
   int index = i*LENGTH+j;
   if(index<0){index=0;}
   if(index>LENGTH*LENGTH){index=LENGTH*LENGTH-1;}
-  printf("x is %f, y is %f, i is %d, j is %d, index is %d\n",x,y,i,j,index);
+  //printf("x is %f, y is %f, i is %d, j is %d, index is %d\n",x,y,i,j,index);            //disabled for better performance
   return inm[index];
 }
 
@@ -285,9 +285,15 @@ main(int argc, char *argv[])
 {
   srand(time(NULL));
   float in = 0.0;
+  int control = 0;
   
   
   FILE *f = fopen("results.txt", "r");
+  fscanf(f,"%d",&LENGTH);
+  fscanf(f,"%d",&control);
+  assert(LENGTH==control);
+  float arr[LENGTH*LENGTH];
+  inm = &arr;
   for(int i=0; i<LENGTH*LENGTH; i++)
   {
     fscanf(f,"%f",&in);
