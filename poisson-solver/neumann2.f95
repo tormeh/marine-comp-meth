@@ -154,6 +154,7 @@
         REAL NEWESTIMATE
         REAL BOUNDARY
         REAL BOUNDARYPURE
+        REAL ANALYTICAL
         INTEGER I,J
         REAL HIGHESTCHANGEFUN
         REAL LOWHIGHESTCHANGE
@@ -161,6 +162,7 @@
         REAL LOWAVGCHANGE
         REAL LOWCHANGE
         REAL AVGERROR
+        REAL NUMAVGERROR
         INTEGER NUMITERATIONS
         LOWAVGCHANGE = 20.0
         AVGCHANGE = 1.0
@@ -198,17 +200,26 @@
         
         WRITE (*,*) "NUMITERATIONS IS ", NUMITERATIONS
         
-        AVGERROR = 0.0
+        NUMAVGERROR = 0.0
         DO I=1,LENGTH
           DO J=1,LENGTH
           IF (I==1 .OR. I==LENGTH .OR. J==1 .OR. J==LENGTH) THEN
-            AVGERROR = AVGERROR + ABS(PHIS(I,J)-BOUNDARYPURE(I,J,H,PHIS,LENGTH))/SIZE
+            NUMAVGERROR = NUMAVGERROR + ABS(PHIS(I,J)-BOUNDARYPURE(I,J,H,PHIS,LENGTH))/SIZE
           ELSE
-            AVGERROR = AVGERROR + ABS(PHIS(I,J)-NEWESTIMATE(I,J,H,PHIS,LENGTH))/SIZE
+            NUMAVGERROR = NUMAVGERROR + ABS(PHIS(I,J)-NEWESTIMATE(I,J,H,PHIS,LENGTH))/SIZE
           END IF
           END DO
         END DO
-        WRITE (*,*) "AVGERROR IS ", AVGERROR
+        WRITE (*,*) "AVERAGE NUMERICALLY ESTIMATED ERROR IS ", NUMAVGERROR
+        
+        !performance metrics. Analytically determined error is printed
+        AVGERROR = 0.0
+        DO I=1,LENGTH
+          DO J=1,LENGTH
+          AVGERROR = AVGERROR + ABS(PHIS(I,J)-ANALYTICAL(I,J,H))/SIZE
+          END DO
+        END DO
+        WRITE (*,*) "AVERAGE ANALYTICALLY DETERMINED ERROR IS ", AVGERROR
         
         open (unit=out_unit,file="results.txt",action="write",status="replace")
         WRITE (OUT_UNIT,'(I3)') LENGTH
