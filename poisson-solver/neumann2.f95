@@ -1,3 +1,5 @@
+!gfortran neumann2.f95 -fimplicit-none -O3 -o neumann2 && ./neumann2
+
 
       FUNCTION F2(X,Y,H)
         INTEGER X,Y

@@ -1,4 +1,4 @@
-!gfortran neumann1.f95 -fimplicit-none -O3
+!gfortran neumann1.f95 -fimplicit-none -O3 -o neumann1 && ./neumann1
       
       FUNCTION F1(X,Y,H)
         INTEGER X,Y
