@@ -9,7 +9,14 @@
         RETURN
       END FUNCTION
            
-      
+      FUNCTION ANALYTICAL(X,Y,H)
+        REAL ANALYTICAL
+        INTEGER :: X
+        INTEGER :: Y
+        REAL :: H
+        ANALYTICAL = 12 - 12*X*H - 12*Y*H
+        RETURN
+      END FUNCTION
       
       FUNCTION BOUNDARY(X,Y,H,PHIS,LENGTH)
         INTEGER X

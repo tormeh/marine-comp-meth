@@ -12,7 +12,14 @@
         RETURN
       END FUNCTION
       
-      
+      FUNCTION ANALYTICAL(X,Y,H)
+        REAL ANALYTICAL
+        INTEGER :: X
+        INTEGER :: Y
+        REAL :: H
+        ANALYTICAL = (1/4.0)*(X*X*H*H+Y*Y*H*H)
+        RETURN
+      END FUNCTION
       
       FUNCTION F(X,Y,H)
         !the right side of the poisson equation
