@@ -127,18 +127,16 @@
         IF (X==1 .AND. Y==1) THEN
           !PHIS(1,2) = (H*H*F1(1,1,H)-2*PHIS(2,1))/2
           !PHIS(2,1) = (H*H*F1(1,1,H)-2*PHIS(1,2))/2
-          PHIS(1,2)=0.0
-          PHIS(2,1)=0.0
           PHIS(2,2)=0.0
           BOUNDARYTESTT=0.0
         ELSE IF (X==1 .AND. Y==2) THEN
           ORIGINDEMAND = (H*H*F1(1,1,H)-2*PHIS(2,1))/2
           NEWVALUE = (1.0/4.0)*(2*PHIS(X+1,Y)+PHIS(X,Y+1)+PHIS(X,Y-1)-H*H*F1(X,Y,H))
-          BOUNDARYTESTT = PHIS(1,2) !ORIGINDEMAND !(ORIGINDEMAND + NEWVALUE)/2
+          BOUNDARYTESTT = 0.0 !ORIGINDEMAND !(ORIGINDEMAND + NEWVALUE)/2
         ELSE IF (X==2 .AND. Y==1) THEN
           ORIGINDEMAND = (H*H*F1(1,1,H)-2*PHIS(1,2))/2
           NEWVALUE = (1.0/4.0)*(PHIS(X+1,Y)+2*PHIS(X,Y+1)+PHIS(X-1,Y)-H*H*F1(X,Y,H))
-          BOUNDARYTESTT = PHIS(2,1) !ORIGINDEMAND !(ORIGINDEMAND + NEWVALUE)/2
+          BOUNDARYTESTT = 0.0 !ORIGINDEMAND !(ORIGINDEMAND + NEWVALUE)/2
         ELSE IF (X==1 .AND. Y==LENGTH) THEN
           BOUNDARYTESTT = (1.0/4.0)*(2*PHIS(X+1,Y)+2*PHIS(X,Y-1)-H*H*F1(X,Y,H))
         ELSE IF (X==LENGTH .AND. Y==1) THEN
@@ -302,7 +300,7 @@
         LOWHIGHESTCHANGE = 20.0
         HIGHESTCHANGE = 10.0
         
-        WRITE (*,*) "LENGTH*H IS ", (LENGTH*H)
+        WRITE (*,*) "(LENGTH-1)*H IS ", ((LENGTH-1)*H)
         
         DO I=1,LENGTH
           DO J=1,LENGTH
