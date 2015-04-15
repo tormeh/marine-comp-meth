@@ -64,25 +64,504 @@
 Tormod Gjeitnes Hellen
 \end_layout
 
+\begin_layout Title
+TMR4160
+\end_layout
+
 \begin_layout Standard
 http://www.cs.ucl.ac.uk/teaching_learning/msc_cgvi/projects/project_report_structure
 /
-\end_layout
-
-\begin_layout Title
-Title
 \end_layout
 
 \begin_layout Chapter*
 Introduction
 \end_layout
 
+\begin_layout Standard
+The task given was to numerically solve the Poisson equation under Dirichlet
+ and Neumann boundary conditions.
+ The Dirichlet case was pretty straightforward to implement and performed
+ pretty well on first try.
+ In the Neumann case interperting the boundary condition (that the derivative
+ normally over the boundary is 0) proved very challenging and frustrating.
+ In the end six possible approaches were considered.
+\end_layout
+
 \begin_layout Chapter*
 Background
 \end_layout
 
+\begin_layout Standard
+The problem presented is to numerically solve the two-dimensional Poisson
+ equation 
+\begin_inset Formula $\nabla\text{²}\varphi:=\frac{\delta\text{²}\varphi}{\delta x\text{²}}+\frac{\delta\text{²}\varphi}{\delta y\text{²}}=f(x,y)$
+\end_inset
+
+( find 
+\begin_inset Formula $\varphi$
+\end_inset
+
+) under three different conditions
+\end_layout
+
+\begin_layout Enumerate
+With 
+\begin_inset Formula $f(x,y)=1$
+\end_inset
+
+ generally and 
+\begin_inset Formula $\varphi(x,y)=\frac{1}{4}(x\text{²}+y\text{²})$
+\end_inset
+
+ on the boundary(Dirichlet condition)
+\end_layout
+
+\begin_layout Enumerate
+With 
+\begin_inset Formula $f(x,y)=12-12x-12y$
+\end_inset
+
+ generally, 
+\begin_inset Formula $\varphi(0,0)=0$
+\end_inset
+
+ and 
+\begin_inset Formula $\frac{d\varphi}{dn}=0$
+\end_inset
+
+ on the boundary(Neumann condition), where 
+\begin_inset Formula $n$
+\end_inset
+
+ is a vector normal to the boundary.
+\end_layout
+
+\begin_layout Enumerate
+With 
+\begin_inset Formula $f(x,y)=(6-12x)(3y\text{²}-2y\text{³})+(3x\text{²}-2x\text{³})(6-12y)$
+\end_inset
+
+ generally, 
+\begin_inset Formula $\varphi(0,0)=0$
+\end_inset
+
+ and 
+\begin_inset Formula $\frac{d\varphi}{dn}=0$
+\end_inset
+
+ on the boundary(Neumann condition), where 
+\begin_inset Formula $n$
+\end_inset
+
+ is a vector normal to the boundary.
+\end_layout
+
+\begin_layout Standard
+We were to use the discrete abstraction 
+\begin_inset Formula $\nabla\text{²}\varphi:=(\varphi(x+h,y)+\varphi(x-h,y)+\varphi(x,y+h)+\varphi(x,y-h)-4\varphi(x,y))/h\text{²}=f(x,y)$
+\end_inset
+
+.
+ We were permitted to calculate over a quadratic field with points divided
+ up uniformly in both directions.
+\end_layout
+
 \begin_layout Chapter*
 Analysis and Design
+\end_layout
+
+\begin_layout Standard
+Starting from the discrete equation we were allowed to use I decided to
+ use relaxation, as it's relatively straightforward and performs well under
+ most circumstances.
+\end_layout
+
+\begin_layout Standard
+In order to use a relaxation method we need an update rule.
+ Taking a hint as to the desired result from Wikipedia's article on relaxation
+ we perform a transformation:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray}
+(\varphi(x+h,y)+\varphi(x-h,y)+\varphi(x,y+h)+\varphi(x,y-h)-4\varphi(x,y))/h\text{²} & = & f(x,y)\\
+\varphi(x+h,y)+\varphi(x-h,y)+\varphi(x,y+h)+\varphi(x,y-h)-4\varphi(x,y) & = & h\text{²}f(x,y)\nonumber \\
+\varphi(x+h,y)+\varphi(x-h,y)+\varphi(x,y+h)+\varphi(x,y-h)-h\text{²}f(x,y) & = & 4\varphi(x,y)\nonumber \\
+(\varphi(x+h,y)+\varphi(x-h,y)+\varphi(x,y+h)+\varphi(x,y-h)-h\text{²}f(x,y))/4 & = & \varphi(x,y)\nonumber 
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Using the relaxation strategy, we repeatedly set 
+\begin_inset Formula $\varphi(x,y)$
+\end_inset
+
+ to be 
+\begin_inset Formula $(\varphi(x+h,y)+\varphi(x-h,y)+\varphi(x,y+h)+\varphi(x,y-h)-h\text{²}f(x,y))/4$
+\end_inset
+
+ until some convergence criterium is fulfilled.
+\end_layout
+
+\begin_layout Standard
+So far so good.
+ And for the Dirichlet boundary condition, we don't need any more analytics
+ than this.
+ The solution is straightforward.
+ However, now remains the thorny issue on how to best enforce 
+\begin_inset Formula $\frac{d\varphi}{dn}=0$
+\end_inset
+
+ for the Neumann boundary conditions.
+ 
+\end_layout
+
+\begin_layout Section*
+Neumann Boundary Condition Enforcing
+\end_layout
+
+\begin_layout Standard
+The first part (
+\begin_inset Formula $\varphi(0,0)=0$
+\end_inset
+
+) is straightforward, as we let that point be zero and never change it.
+ There are some optimizations to be done near the origin, but they are just
+ Enforcing 
+\begin_inset Formula $\frac{d\varphi}{dn}=0$
+\end_inset
+
+, however, proved very challenging.
+ There are two particular cases that needs consideration:
+\end_layout
+
+\begin_layout Enumerate
+The sides of the square
+\end_layout
+
+\begin_layout Enumerate
+The corners of the square
+\end_layout
+
+\begin_layout Standard
+Let ut consider each in isolation.
+ 
+\end_layout
+
+\begin_layout Standard
+Corner options:
+\end_layout
+
+\begin_layout Enumerate
+Designate the point nearest to the corner that can still be determined by
+ the relaxation rule as special.
+ Set the corner and the two neighboring points equal to this one.
+ Let 
+\begin_inset Formula $(x,y)$
+\end_inset
+
+ be the top right corner
+\begin_inset Formula 
+\begin{eqnarray*}
+\varphi(x,y) & = & \varphi(x-h,y-h)\\
+\varphi(x-h,y) & = & \varphi(x-h,y-h)\\
+\varphi(x,y-h) & = & \varphi(x-h,y-h)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Since 
+\begin_inset Formula $\frac{d\varphi}{dn}=0$
+\end_inset
+
+, we can assume that 
+\begin_inset Formula $\varphi$
+\end_inset
+
+ does not change much between the corner and its neighbors.
+ We simply average (for top right corner: 
+\begin_inset Formula $(x,y)=(max,max)$
+\end_inset
+
+):
+\begin_inset Formula 
+\begin{eqnarray*}
+\varphi(max,max) & = & (\varphi(max-1,max)+\varphi(max,max-1)\varphi(max-1,max-1))/3
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+In the same way, we can say that the points near the origin will have 
+\begin_inset Formula $\varphi$
+\end_inset
+
+ be pretty close to zero:
+\begin_inset Formula 
+\begin{eqnarray*}
+\varphi(0,1) & = & 0\\
+\varphi(1,0) & = & 0\\
+\varphi(1,1) & = & 0
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Approximate 
+\begin_inset Formula $\varphi(x,y)$
+\end_inset
+
+ to be quadratic in the corner.
+ Since 
+\begin_inset Formula $\frac{d\varphi}{dn}=0$
+\end_inset
+
+ we get that the two neighbours per direction of the boundary point are
+ equal to each other, independent of the border point itself.
+ Assuming (x,y) is in the top right corner (
+\begin_inset Formula $(x,y)=(max,max)$
+\end_inset
+
+):
+\begin_inset Formula 
+\begin{eqnarray}
+(\varphi(x+h,y)+\varphi(x-h,y)+\varphi(x,y+h)+\varphi(x,y-h)-4\varphi(x,y))/h\text{²} & = & f(x,y)\\
+(\varphi(x-h,y)+\varphi(x-h,y)+\varphi(x,y-h)+\varphi(x,y-h)-4\varphi(x,y))/h\text{²} & = & f(x,y)\nonumber \\
+(2\varphi(x-h,y)+2\varphi(x,y-h)-4\varphi(x,y))/h\text{²} & = & f(x,y)\nonumber \\
+(2\varphi(x-h,y)+2\varphi(x,y-h)-h\text{²}f(x,y))/4 & = & \varphi(x,y)\nonumber 
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+We can use this to special effect on the origin, since we know that 
+\begin_inset Formula $\varphi(0,0)=0$
+\end_inset
+
+:
+\begin_inset Formula 
+\begin{eqnarray*}
+(2\varphi(h,0)+2\varphi(0,h)-h\text{²}f(0,0))/4 & = & 0\\
+2\varphi(h,0)+2\varphi(0,h)-h\text{²}f(0,0) & = & 0\\
+\varphi(h,0) & = & (h\text{²}f(0,0)-2\varphi(0,h))/2\\
+\varphi(0,h) & = & (h\text{²}f(0,0)-2\varphi(h,0))/2
+\end{eqnarray*}
+
+\end_inset
+
+This is circular, though, and makes the two right-angle neighbors to the
+ origin completely independent of the rest of the matrix, which is clearly
+ unfortunate.
+ No satisfying solution was found.
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+Side options:
+\end_layout
+
+\begin_layout Enumerate
+Approximate 
+\begin_inset Formula $\varphi(x,y)$
+\end_inset
+
+ to be linear on the border.
+ Since 
+\begin_inset Formula $\frac{d\varphi}{dn}=0$
+\end_inset
+
+ we get that the two neighbours in the 
+\begin_inset Formula $n$
+\end_inset
+
+ direction of a boundary point are equal to that point.
+ This changes the math from (1) a bit.
+ Assuming (x,y) is on the left border(
+\begin_inset Formula $x=0$
+\end_inset
+
+):
+\begin_inset Formula 
+\begin{eqnarray}
+(\varphi(x+h,y)+\varphi(x-h,y)+\varphi(x,y+h)+\varphi(x,y-h)-4\varphi(x,y))/h\text{²} & = & f(x,y)\\
+(\varphi(x,y)+\varphi(x,y)+\varphi(x,y+h)+\varphi(x,y-h)-4\varphi(x,y))/h\text{²} & = & f(x,y)\nonumber \\
+(\varphi(x,y+h)+\varphi(x,y-h)-2\varphi(x,y))/h\text{²} & = & f(x,y)\nonumber \\
+\varphi(x,y+h)+\varphi(x,y-h)-2\varphi(x,y) & = & h\text{²}f(x,y)\nonumber \\
+\varphi(x,y+h)+\varphi(x,y-h)-h\text{²}f(x,y) & = & 2\varphi(x,y)\nonumber \\
+(\varphi(x,y+h)+\varphi(x,y-h)-h\text{²}f(x,y))/2 & = & \varphi(x,y)\nonumber 
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Optionally, we can say that, in order for this to be consistent with how
+ the in-memory matrix actually looks, the boundary point's neighbor inside
+ the matrix is updated along with the boundary point.
+ This means that, for 
+\begin_inset Formula $x=0$
+\end_inset
+
+, after updating 
+\begin_inset Formula $\varphi(x+h,y)==\varphi(x,y)$
+\end_inset
+
+.
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Approximate 
+\begin_inset Formula $\varphi(x,y)$
+\end_inset
+
+ to be quadratic on the border.
+ Since 
+\begin_inset Formula $\frac{d\varphi}{dn}=0$
+\end_inset
+
+ we get that the two neighbours in the 
+\begin_inset Formula $n$
+\end_inset
+
+ direction of a boundary point are equal to each other, independent of the
+ border point itself.
+ Assuming (x,y) is on the left border(
+\begin_inset Formula $x=0$
+\end_inset
+
+):
+\begin_inset Formula 
+\begin{eqnarray}
+(\varphi(x+h,y)+\varphi(x-h,y)+\varphi(x,y+h)+\varphi(x,y-h)-4\varphi(x,y))/h\text{²} & = & f(x,y)\\
+(\varphi(x+h,y)+\varphi(x+h,y)+\varphi(x,y+h)+\varphi(x,y-h)-4\varphi(x,y))/h\text{²} & = & f(x,y)\nonumber \\
+(2\varphi(x+h,y)+\varphi(x,y+h)+\varphi(x,y-h)-4\varphi(x,y))/h\text{²} & = & f(x,y)\nonumber \\
+2\varphi(x-h,y)+\varphi(x,y+h)+\varphi(x,y-h)-4\varphi(x,y) & = & h\text{²}f(x,y)\nonumber \\
+2\varphi(x+h,y)+\varphi(x,y+h)+\varphi(x,y-h)-h\text{²}f(x,y) & = & 4\varphi(x,y)\nonumber \\
+(2\varphi(x+h,y)+\varphi(x,y+h)+\varphi(x,y-h)-h\text{²}f(x,y))/4 & = & \varphi(x,y)\nonumber 
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section*
+Analytical Solutions
+\end_layout
+
+\begin_layout Standard
+For the first task (the Dirichlet one) we need 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $\nabla\text{²}\varphi=1$
+\end_inset
+
+in general and 
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+
+\begin_inset Formula $\varphi(x,y)=\frac{1}{4}(x\text{²}+y\text{²})$
+\end_inset
+
+ on the boundary.
+ Turns out that 
+\begin_inset Formula $\varphi(x,y)=\frac{1}{4}(x\text{²}+y\text{²})$
+\end_inset
+
+ satisfies both.
+\end_layout
+
+\begin_layout Standard
+For the second task (first Neumann one) we need 
+\begin_inset Formula $\nabla\text{²}\varphi=12-12x-12y$
+\end_inset
+
+ generally, 
+\begin_inset Formula $\varphi(0,0)=0$
+\end_inset
+
+ and 
+\begin_inset Formula $\frac{d\varphi}{dn}=0$
+\end_inset
+
+ on boundary.
+ With some trial and error, it can be determined that 
+\begin_inset Formula $3x\text{²}+3y\text{²}-2x\text{³}-2y\text{³}$
+\end_inset
+
+ satisfies those.
+\end_layout
+
+\begin_layout Standard
+For the third task (second Neumann one) we need 
+\begin_inset Formula $\nabla\text{²}\varphi=(6-12x)(3y\text{²}-2y\text{³})+(3x\text{²}-2x\text{³})(6-12y)$
+\end_inset
+
+ generally, 
+\begin_inset Formula $\varphi(0,0)=0$
+\end_inset
+
+ and 
+\begin_inset Formula $\frac{d\varphi}{dn}=0$
+\end_inset
+
+ on boundary.
+ This seems like a very hard nut to crack until you realise that:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+(6-12x)(3y\text{²}-2y\text{³})+(3x\text{²}-2x\text{³})(6-12y)=\frac{\delta\text{²}i}{\delta x\text{²}}j+i\frac{\delta\text{²}j}{\delta x\text{²}}
+\end{equation}
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Chapter*
@@ -91,6 +570,141 @@ Implementation
 
 \begin_layout Chapter*
 Testing
+\end_layout
+
+\begin_layout Standard
+Here's time taken for the best boundary approach.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="4">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+analytically determined average squared error 
+\backslash
+ distance between points
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.01
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.001
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Chapter*
