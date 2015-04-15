@@ -84,7 +84,11 @@ The task given was to numerically solve the Poisson equation under Dirichlet
  pretty well on first try.
  In the Neumann case interperting the boundary condition (that the derivative
  normally over the boundary is 0) proved very challenging and frustrating.
- In the end six possible approaches were considered.
+\end_layout
+
+\begin_layout Standard
+Another source of error was that arrays are 1-indexed, which matters when
+ you're trying to determine the coordinates from the matrix index.
 \end_layout
 
 \begin_layout Chapter*
@@ -556,7 +560,7 @@ For the third task (second Neumann one) we need
 \begin_layout Standard
 \begin_inset Formula 
 \begin{equation}
-(6-12x)(3y\text{²}-2y\text{³})+(3x\text{²}-2x\text{³})(6-12y)=\frac{\delta\text{²}i}{\delta x\text{²}}j+i\frac{\delta\text{²}j}{\delta x\text{²}}
+(6-12x)(3y\text{²}-2y\text{³})+(3x\text{²}-2x\text{³})(6-12y)=\frac{\delta\text{²}i}{\delta x\text{²}}j+i\frac{\delta\text{²}j}{\delta y\text{²}}
 \end{equation}
 
 \end_inset
@@ -564,8 +568,312 @@ For the third task (second Neumann one) we need
 
 \end_layout
 
+\begin_layout Standard
+and that
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray}
+\nabla\text{²}(ij) & = & \frac{\delta\text{²}ij}{\delta x\text{²}}+\frac{\delta\text{²}ij}{\delta y\text{²}}\\
+\nabla\text{²}(ij) & = & \frac{\delta\text{²}i}{\delta x\text{²}}j+i\frac{\delta\text{²}j}{\delta x\text{²}}+\frac{\delta\text{²}i}{\delta y\text{²}}j+i\frac{\delta\text{²}j}{\delta y\text{²}}+2\frac{\delta i}{\delta x}\frac{\delta j}{\delta x}+2\frac{\delta i}{\delta y}\frac{\delta j}{\delta y}
+\end{eqnarray}
+
+\end_inset
+
+Here all the terms reduce to 
+\begin_inset Formula $0$
+\end_inset
+
+ except 
+\begin_inset Formula $\frac{\delta\text{²}i}{\delta x\text{²}}j+i\frac{\delta\text{²}j}{\delta y\text{²}}$
+\end_inset
+
+, which means, together with the other requirements, that 
+\begin_inset Formula $\varphi(x,y)=(3y\text{²}-2y\text{³})(3x\text{²}-2x\text{³})$
+\end_inset
+
+.
+\end_layout
+
 \begin_layout Chapter*
 Implementation
+\end_layout
+
+\begin_layout Standard
+List of functions and description of each in the Dirichlet case:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="6" columns="2">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+BOUNDARY
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+returns 0.25*(x²+y²)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ANALYTICAL
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+returns the analytically determined answer
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+F
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+returns 1; the right side of the poisson equation
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+NEWESTIMATE
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+performs the relaxation application rule
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+HIGHESTCHANGEFUN
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+returns the gighest change in (phi-)value given a new old value, new assignment
+ and the previous highest change
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+LOWCHANGE
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+returns the lesser of two variables.
+ Intended to compare change magnitudes to determine the lowest one.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+List of functions and description of each in the Neumann cases:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="6" columns="2">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+BOUNDARY
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ANALYTICAL
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+F
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+NEWESTIMATE
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+HIGHESTCHANGEFUN
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+LOWCHANGE
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Chapter*

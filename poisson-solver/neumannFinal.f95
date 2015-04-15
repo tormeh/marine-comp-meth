@@ -5,7 +5,12 @@
         INTEGER X,Y
         REAL H
         REAL F
-        F=1
+        REAL :: XC
+        REAL :: YC
+        XC = (X-1)*H
+        YC = (Y-1)*H
+        !F=12-12*XC-12*YC
+        F=(6-12*XC)*(3*YC**2-2*YC**3) + (3*XC**2-2*XC**3)*(6-12*YC)
         RETURN
       END FUNCTION
            
@@ -19,7 +24,8 @@
         REAL :: YC
         XC = (X-1)*H
         YC = (Y-1)*H
-        ANALYTICAL = 0.25*(XC**2+YC**2)
+        !ANALYTICAL = 3*XC**2 + 3*YC**2 - 2*XC**3 - 2*YC**3
+        ANALYTICAL = (3*YC**2 - 2*YC**3)*(3*XC**2 - 2*XC**3)
         RETURN
       END FUNCTION
       
@@ -35,12 +41,29 @@
         REAL SIMPLEESTIMATE
         REAL F
         REAL :: ORIGINDEMAND
-        REAL :: XC
-        REAL :: YC
-        XC = (X-1)*H
-        YC = (Y-1)*H
-        IF (X==1 .OR. Y==1 .OR. X==LENGTH .OR. Y==LENGTH) THEN
-          NEWESTIMATE = 0.25*(XC**2+YC**2)
+        IF (X==1 .AND. Y==1) THEN
+          PHIS(1,2)=0.0
+          PHIS(2,1)=0.0
+          PHIS(2,2)=0.0
+          NEWESTIMATE=0.0
+        ELSE IF (X==1 .AND. Y==LENGTH) THEN
+          NEWESTIMATE = (PHIS(2,LENGTH-1) + PHIS(2,LENGTH) + PHIS(1,LENGTH-1))/3.0
+        ELSE IF (X==LENGTH .AND. Y==1) THEN
+          NEWESTIMATE = (PHIS(LENGTH-1,2) + PHIS(LENGTH,2) + PHIS(LENGTH-1,1))/3.0
+        ELSE IF (X==LENGTH .AND. Y==LENGTH) THEN
+          NEWESTIMATE = (PHIS(LENGTH-1,LENGTH-1) + PHIS(LENGTH-1,LENGTH) + PHIS(LENGTH,LENGTH-1))/3.0
+        ELSE IF (X==1) THEN
+          NEWVALUE = (1.0/4.0)*(2*PHIS(X+1,Y)+PHIS(X,Y+1)+PHIS(X,Y-1)-H*H*F(X,Y,H))
+          NEWESTIMATE = NEWVALUE
+        ELSE IF (X==LENGTH) THEN
+          NEWVALUE = (1.0/4.0)*(PHIS(X,Y+1)+2*PHIS(X-1,Y)+PHIS(X,Y-1)-H*H*F(X,Y,H))
+          NEWESTIMATE = NEWVALUE
+        ELSE IF (Y==1) THEN
+          NEWVALUE = (1.0/4.0)*(PHIS(X+1,Y)+2*PHIS(X,Y+1)+PHIS(X-1,Y)-H*H*F(X,Y,H))
+          NEWESTIMATE = NEWVALUE
+        ELSE IF (Y==LENGTH) THEN
+          NEWVALUE = (1.0/4.0)*(PHIS(X+1,Y)+PHIS(X-1,Y)+2*PHIS(X,Y-1)-H*H*F(X,Y,H))
+          NEWESTIMATE = NEWVALUE
         ELSE
           NEWESTIMATE = SIMPLEESTIMATE(X,Y,H,PHIS,LENGTH)
         END IF
@@ -109,7 +132,7 @@
       END FUNCTION
       
       PROGRAM SOLVER
-        REAL, PARAMETER :: H = 0.005
+        REAL, PARAMETER :: H = 0.01
         INTEGER, PARAMETER :: LENGTH = (1.0/H)+1
         INTEGER, PARAMETER :: SIZE = LENGTH*LENGTH
         REAL :: PHIS(LENGTH, LENGTH)
