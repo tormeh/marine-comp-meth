@@ -1,4 +1,4 @@
-!gfortran neumannFinal.f95 -fimplicit-none -O3 -o neumannFinal -fdefault-real-8 && time ./neumannFinal
+!gfortran dirichlet.f95 -fimplicit-none -O3 -o dirichlet -fdefault-real-8 && time ./dirichlet
       
       FUNCTION F(X,Y,H)
         !the right side of the poisson equation
@@ -88,8 +88,8 @@
         END IF
       END FUNCTION
       
-      FUNCTION ANALERROR(PHIS,LENGTH,H,SIZE)
-        !computes the analytically determined error
+      FUNCTION ANALYTICALERROR(PHIS,LENGTH,H,SIZE)
+        !computes the analytically determined average squared error
         INTEGER SIZE
         INTEGER LENGTH
         REAL H
@@ -97,14 +97,14 @@
         REAL ANALYTICAL
         REAL AVGERROR
         INTEGER I,J
-        REAL ANALERROR
+        REAL ANALYTICALERROR
         AVGERROR = 0.0
         DO J=1,LENGTH
           DO I=1,LENGTH
           AVGERROR = AVGERROR + ((PHIS(I,J)-ANALYTICAL(I,J,H))**2)/SIZE
           END DO
         END DO
-        ANALERROR = AVGERROR
+        ANALYTICALERROR = AVGERROR
         RETURN
       END FUNCTION
       
@@ -128,7 +128,7 @@
         REAL AVGERROR
         REAL NUMAVGERROR
         INTEGER NUMITERATIONS
-        REAL ANALERROR
+        REAL ANALYTICALERROR
         LOWAVGCHANGE = 20.0
         AVGCHANGE = 1.0
         LOWHIGHESTCHANGE = 20.0
@@ -145,7 +145,7 @@
         
         NUMITERATIONS = 0
         !the actual computation is performed here
-        DO WHILE  ((LOWHIGHESTCHANGE/HIGHESTCHANGE) > 1.00001 .OR. (LOWAVGCHANGE/AVGCHANGE) > 1.00001) !(NUMITERATIONS < 200000) !(ANALERROR(PHIS,LENGTH,H,SIZE)>0.000000006)! !((SIMPLEESTIMATE(2,2,H,PHIS,LENGTH)-0)**2>0.00001)!
+        DO WHILE  ((LOWHIGHESTCHANGE/HIGHESTCHANGE) > 1.00001 .OR. (LOWAVGCHANGE/AVGCHANGE) > 1.00001) !(NUMITERATIONS < 200000) !(ANALYTICALERROR(PHIS,LENGTH,H,SIZE)>0.000000006)! !((SIMPLEESTIMATE(2,2,H,PHIS,LENGTH)-0)**2>0.00001)!
           NUMITERATIONS = NUMITERATIONS + 1
           LOWAVGCHANGE = LOWCHANGE(LOWAVGCHANGE, AVGCHANGE)
           LOWHIGHESTCHANGE = LOWCHANGE(LOWHIGHESTCHANGE, HIGHESTCHANGE)

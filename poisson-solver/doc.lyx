@@ -28,7 +28,7 @@
 \spacing single
 \use_hyperref false
 \papersize default
-\use_geometry false
+\use_geometry true
 \use_amsmath 1
 \use_esint 1
 \use_mhchem 1
@@ -43,6 +43,8 @@
 \shortcut idx
 \color #008000
 \end_index
+\leftmargin 0.2cm
+\rightmargin 0.2cm
 \secnumdepth 3
 \tocdepth 3
 \paragraph_separation indent
@@ -596,17 +598,60 @@ Here all the terms reduce to
 .
 \end_layout
 
+\begin_layout Section*
+Memory use
+\end_layout
+
+\begin_layout Standard
+No memory is allocated dynamically and only the matrix holding the values
+ itself has a size that depends on inter-point distance.
+ In terms of big-O notation, memory use is O(1/h²), where h is the inter-point
+ distance.
+ An interesting note is that, as the matrix is the main source of memory
+ consumption, setting real to be 8 bytes means memory consumption roughly
+ doubles.
+\end_layout
+
+\begin_layout Section*
+Convergence criterium
+\end_layout
+
+\begin_layout Standard
+There were many possible ones to consider
+\end_layout
+
+\begin_layout Enumerate
+Setting a minimum permitted ratio of current average change to previous
+ average change
+\end_layout
+
+\begin_layout Enumerate
+Setting a minimum permitted ratio of current maximum change to previous
+ maximum change
+\end_layout
+
+\begin_layout Enumerate
+For Neumann: Using the fact that we know points close to origin to be close
+ to zero, we can say that we want (1,1) to be closer to zero than a certain
+ difference.
+\end_layout
+
+\begin_layout Enumerate
+Setting a minimum permitted ratio of current average change to previous
+ average change
+\end_layout
+
 \begin_layout Chapter*
 Implementation
 \end_layout
 
 \begin_layout Standard
-List of functions and description of each in the Dirichlet case:
+List of functions and description of each:
 \end_layout
 
 \begin_layout Standard
 \begin_inset Tabular
-<lyxtabular version="3" rows="6" columns="2">
+<lyxtabular version="3" rows="7" columns="2">
 <features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
@@ -615,7 +660,7 @@ List of functions and description of each in the Dirichlet case:
 \begin_inset Text
 
 \begin_layout Plain Layout
-BOUNDARY
+F
 \end_layout
 
 \end_inset
@@ -624,7 +669,7 @@ BOUNDARY
 \begin_inset Text
 
 \begin_layout Plain Layout
-returns 0.25*(x²+y²)
+the right side of the poisson equation
 \end_layout
 
 \end_inset
@@ -644,7 +689,7 @@ ANALYTICAL
 \begin_inset Text
 
 \begin_layout Plain Layout
-returns the analytically determined answer
+computes the analytical solution
 \end_layout
 
 \end_inset
@@ -655,7 +700,7 @@ returns the analytically determined answer
 \begin_inset Text
 
 \begin_layout Plain Layout
-F
+SIMPLEESTIMATE
 \end_layout
 
 \end_inset
@@ -664,7 +709,8 @@ F
 \begin_inset Text
 
 \begin_layout Plain Layout
-returns 1; the right side of the poisson equation
+computes a new estimate for the value of (x*h,y*h).
+ Not valid on the boundary
 \end_layout
 
 \end_inset
@@ -684,7 +730,8 @@ NEWESTIMATE
 \begin_inset Text
 
 \begin_layout Plain Layout
-performs the relaxation application rule
+computes the value of ((x-1)*h,(y-h)*h).
+ Valid everywhere.
 \end_layout
 
 \end_inset
@@ -712,7 +759,7 @@ returns the gighest change in (phi-)value given a new old value, new assignment
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -721,7 +768,7 @@ LOWCHANGE
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -732,29 +779,12 @@ returns the lesser of two variables.
 \end_inset
 </cell>
 </row>
-</lyxtabular>
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-List of functions and description of each in the Neumann cases:
-\end_layout
-
-\begin_layout Standard
-\begin_inset Tabular
-<lyxtabular version="3" rows="6" columns="2">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
 <row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-BOUNDARY
+ANALYTICALERROR
 \end_layout
 
 \end_inset
@@ -763,113 +793,299 @@ BOUNDARY
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-ANALYTICAL
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-F
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-NEWESTIMATE
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-HIGHESTCHANGEFUN
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-LOWCHANGE
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
+computes the analytically determined average squared error
 \end_layout
 
 \end_inset
 </cell>
 </row>
 </lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here is the most interesting code, which is for the Neumann case
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+FUNCTION NEWESTIMATE(X,Y,H,PHIS,LENGTH)
+\end_layout
+
+\begin_layout Plain Layout
+
+  !computes the value of ((x-1)*h,(y-h)*h).
+ Valid everywhere.
+\end_layout
+
+\begin_layout Plain Layout
+
+  INTEGER X
+\end_layout
+
+\begin_layout Plain Layout
+
+  INTEGER  Y
+\end_layout
+
+\begin_layout Plain Layout
+
+  REAL H
+\end_layout
+
+\begin_layout Plain Layout
+
+  INTEGER LENGTH
+\end_layout
+
+\begin_layout Plain Layout
+
+  REAL NEWVALUE
+\end_layout
+
+\begin_layout Plain Layout
+
+  REAL :: PHIS(LENGTH,LENGTH)
+\end_layout
+
+\begin_layout Plain Layout
+
+  REAL NEWESTIMATE
+\end_layout
+
+\begin_layout Plain Layout
+
+  REAL SIMPLEESTIMATE
+\end_layout
+
+\begin_layout Plain Layout
+
+  REAL F
+\end_layout
+
+\begin_layout Plain Layout
+
+  REAL :: ORIGINDEMAND
+\end_layout
+
+\begin_layout Plain Layout
+
+  IF (X==1 .AND.
+ Y==1) THEN
+\end_layout
+
+\begin_layout Plain Layout
+
+    PHIS(1,2)=0.0
+\end_layout
+
+\begin_layout Plain Layout
+
+    PHIS(2,1)=0.0
+\end_layout
+
+\begin_layout Plain Layout
+
+    PHIS(2,2)=0.0
+\end_layout
+
+\begin_layout Plain Layout
+
+    NEWESTIMATE=0.0
+\end_layout
+
+\begin_layout Plain Layout
+
+  ELSE IF (X==1 .AND.
+ Y==LENGTH) THEN
+\end_layout
+
+\begin_layout Plain Layout
+
+    NEWESTIMATE = (PHIS(2,LENGTH-1) + PHIS(2,LENGTH) + PHIS(1,LENGTH-1))/3.0
+\end_layout
+
+\begin_layout Plain Layout
+
+  ELSE IF (X==LENGTH .AND.
+ Y==1) THEN
+\end_layout
+
+\begin_layout Plain Layout
+
+    NEWESTIMATE = (PHIS(LENGTH-1,2) + PHIS(LENGTH,2) + PHIS(LENGTH-1,1))/3.0
+\end_layout
+
+\begin_layout Plain Layout
+
+  ELSE IF (X==LENGTH .AND.
+ Y==LENGTH) THEN
+\end_layout
+
+\begin_layout Plain Layout
+
+    NEWESTIMATE = (PHIS(LENGTH-1,LENGTH-1) + PHIS(LENGTH-1,LENGTH) + PHIS(LENGTH
+,LENGTH-1))/3.0
+\end_layout
+
+\begin_layout Plain Layout
+
+  ELSE IF (X==1) THEN
+\end_layout
+
+\begin_layout Plain Layout
+
+    NEWVALUE = (1.0/4.0)*(2*PHIS(X+1,Y)+PHIS(X,Y+1)+PHIS(X,Y-1)-H*H*F(X,Y,H))
+\end_layout
+
+\begin_layout Plain Layout
+
+    NEWESTIMATE = NEWVALUE
+\end_layout
+
+\begin_layout Plain Layout
+
+  ELSE IF (X==LENGTH) THEN
+\end_layout
+
+\begin_layout Plain Layout
+
+    NEWVALUE = (1.0/4.0)*(PHIS(X,Y+1)+2*PHIS(X-1,Y)+PHIS(X,Y-1)-H*H*F(X,Y,H))
+\end_layout
+
+\begin_layout Plain Layout
+
+    NEWESTIMATE = NEWVALUE
+\end_layout
+
+\begin_layout Plain Layout
+
+  ELSE IF (Y==1) THEN
+\end_layout
+
+\begin_layout Plain Layout
+
+    NEWVALUE = (1.0/4.0)*(PHIS(X+1,Y)+2*PHIS(X,Y+1)+PHIS(X-1,Y)-H*H*F(X,Y,H))
+\end_layout
+
+\begin_layout Plain Layout
+
+    NEWESTIMATE = NEWVALUE
+\end_layout
+
+\begin_layout Plain Layout
+
+  ELSE IF (Y==LENGTH) THEN
+\end_layout
+
+\begin_layout Plain Layout
+
+    NEWVALUE = (1.0/4.0)*(PHIS(X+1,Y)+PHIS(X-1,Y)+2*PHIS(X,Y-1)-H*H*F(X,Y,H))
+\end_layout
+
+\begin_layout Plain Layout
+
+    NEWESTIMATE = NEWVALUE
+\end_layout
+
+\begin_layout Plain Layout
+
+  ELSE
+\end_layout
+
+\begin_layout Plain Layout
+
+    NEWESTIMATE = SIMPLEESTIMATE(X,Y,H,PHIS,LENGTH)
+\end_layout
+
+\begin_layout Plain Layout
+
+  END IF
+\end_layout
+
+\begin_layout Plain Layout
+
+  RETURN
+\end_layout
+
+\begin_layout Plain Layout
+
+END FUNCTION
+\end_layout
+
+\begin_layout Plain Layout
+
+     
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+FUNCTION SIMPLEESTIMATE(X,Y,H,PHIS,LENGTH)
+\end_layout
+
+\begin_layout Plain Layout
+
+  !computes a new estimate for the value of (x*h,y*h).
+ Not valid on the boundary
+\end_layout
+
+\begin_layout Plain Layout
+
+  INTEGER X,Y
+\end_layout
+
+\begin_layout Plain Layout
+
+  REAL H
+\end_layout
+
+\begin_layout Plain Layout
+
+  REAL SIMPLEESTIMATE
+\end_layout
+
+\begin_layout Plain Layout
+
+  INTEGER LENGTH
+\end_layout
+
+\begin_layout Plain Layout
+
+  REAL F
+\end_layout
+
+\begin_layout Plain Layout
+
+  REAL :: PHIS(LENGTH,LENGTH)
+\end_layout
+
+\begin_layout Plain Layout
+
+  SIMPLEESTIMATE = (1.0/4.0)*(PHIS(X+1,Y)+PHIS(X,Y+1)+PHIS(X-1,Y)+PHIS(X,Y-1)-H*H*
+F(X,Y,H))
+\end_layout
+
+\begin_layout Plain Layout
+
+  RETURN
+\end_layout
+
+\begin_layout Plain Layout
+
+END FUNCTION
+\end_layout
 
 \end_inset
 
@@ -881,30 +1097,46 @@ Testing
 \end_layout
 
 \begin_layout Standard
-Here's time taken for the best boundary approach.
+In the end it turned out that whether you approximates the phi at the boundary
+ as being linear or quadratic has little effect.
+ On, the corners, however, simple averaging gives markedly superior results.
+ Setting the four points at the origin and closest to it to zero at each
+ iteration start is also a 
+\end_layout
+
+\begin_layout Standard
+Here's time taken and accuracy(average squared error) for the best boundary
+ approach using the second Neumann task.
 \end_layout
 
 \begin_layout Standard
 \begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="4">
+<lyxtabular version="3" rows="3" columns="2">
 <features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-analytically determined average squared error 
-\backslash
- distance between points
+distance between points
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+time / accuracy
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -913,6 +1145,17 @@ analytically determined average squared error
 
 \end_inset
 </cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0m0.012s / 9.9817812014075917E-005
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
@@ -926,83 +1169,7 @@ analytically determined average squared error
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.001
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
+1m46.588s / 5.8456351344354158E-009
 \end_layout
 
 \end_inset
@@ -1013,10 +1180,6 @@ analytically determined average squared error
 \end_inset
 
 
-\end_layout
-
-\begin_layout Chapter*
-Results
 \end_layout
 
 \begin_layout Chapter*
