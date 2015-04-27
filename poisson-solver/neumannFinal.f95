@@ -41,11 +41,18 @@
         REAL SIMPLEESTIMATE
         REAL F
         REAL :: ORIGINDEMAND
+        REAL :: TWO_ONE
+        REAL :: ONE_TWO
         IF (X==1 .AND. Y==1) THEN
-          PHIS(1,2)=0.0
-          PHIS(2,1)=0.0
-          PHIS(2,2)=0.0
+          TWO_ONE=(F(1,1,H)**2-2*PHIS(1,2))/2.0
+          ONE_TWO=(F(1,1,H)**2-2*PHIS(2,1))/2.0
+          PHIS(1,2)=ONE_TWO
+          PHIS(2,1)=TWO_ONE
           NEWESTIMATE=0.0
+        ELSE IF (X==2 .AND. Y==2) THEN
+          TWO_ONE=(F(1,1,H)**2-2*PHIS(1,2))/2.0
+          ONE_TWO=(F(1,1,H)**2-2*PHIS(2,1))/2.0
+          NEWESTIMATE = (1.0/4.0)*(PHIS(X+1,Y)+PHIS(X,Y+1)+ONE_TWO+TWO_ONE-H*H*F(X,Y,H))
         ELSE IF (X==1 .AND. Y==LENGTH) THEN
           NEWESTIMATE = (PHIS(2,LENGTH-1) + PHIS(2,LENGTH) + PHIS(1,LENGTH-1))/3.0
         ELSE IF (X==LENGTH .AND. Y==1) THEN
@@ -132,7 +139,7 @@
       END FUNCTION
       
       PROGRAM SOLVER
-        REAL, PARAMETER :: H = 0.02
+        REAL, PARAMETER :: H = 0.0105
         INTEGER, PARAMETER :: LENGTH = (1.0/H)+1
         INTEGER, PARAMETER :: SIZE = LENGTH*LENGTH
         REAL :: PHIS(LENGTH, LENGTH)
@@ -152,23 +159,26 @@
         REAL NUMAVGERROR
         INTEGER NUMITERATIONS
         REAL ANALYTICALERROR
-        LOWAVGCHANGE = 20.0
-        AVGCHANGE = 1.0
-        LOWHIGHESTCHANGE = 20.0
-        HIGHESTCHANGE = 10.0
+        REAL :: r(5,5)
+        INTEGER :: SEED
+        LOWAVGCHANGE = 20000.0
+        AVGCHANGE = 10000.0
+        LOWHIGHESTCHANGE = 20000.0
+        HIGHESTCHANGE = 10000.0
         
-        !a friendly reminder that what the real coordinate is (x-1)*h, not x*h
+        WRITE (*,*) "LENGTH IS ", LENGTH
+        !a friendly reminder that the real coordinate is (x-1)*h, not x*h
         WRITE (*,*) "(LENGTH-1)*H IS ", ((LENGTH-1)*H)
         
         DO I=1,LENGTH
           DO J=1,LENGTH
-            PHIS(I,J) = RAND(0)*10
+            PHIS(I,J) = RAND(SEED)*10.0
           END DO
         END DO
         
         NUMITERATIONS = 0
         !the actual computation is performed here
-        DO WHILE  ((LOWHIGHESTCHANGE/HIGHESTCHANGE) > 1.00001 .OR. (LOWAVGCHANGE/AVGCHANGE) > 1.00001) !(NUMITERATIONS < 200000) !(ANALYTICALERROR(PHIS,LENGTH,H,SIZE)>0.000000006)! !((SIMPLEESTIMATE(2,2,H,PHIS,LENGTH)-0)**2>0.00001)!
+        DO WHILE      ((LOWHIGHESTCHANGE/HIGHESTCHANGE) > 1.1 .OR. (LOWAVGCHANGE/AVGCHANGE) > 1.000008)
           NUMITERATIONS = NUMITERATIONS + 1
           LOWAVGCHANGE = LOWCHANGE(LOWAVGCHANGE, AVGCHANGE)
           LOWHIGHESTCHANGE = LOWCHANGE(LOWHIGHESTCHANGE, HIGHESTCHANGE)
@@ -182,7 +192,17 @@
                 PHIS(I,J) = NEWVALUE
             END DO
           END DO
+          !WRITE (*,*) "HIGHESTCHANGE IS ", HIGHESTCHANGE
+          !WRITE (*,*) "AVGCHANGE IS ", AVGCHANGE
+          !WRITE (*,*) "LOWAVGCHANGE IS ", LOWAVGCHANGE
+          !WRITE (*,*) "LOWHIGHESTCHANGE IS ", LOWHIGHESTCHANGE
+          !WRITE (*,*) ""
         END DO
+        
+        WRITE (*,*) "ratio", (LOWHIGHESTCHANGE/HIGHESTCHANGE) > 1.00000000
+        WRITE (*,*) "ratio", LOWHIGHESTCHANGE/HIGHESTCHANGE
+        WRITE (*,*) "ratio", (LOWAVGCHANGE/AVGCHANGE) > 1.00000000
+        WRITE (*,*) "ratio", LOWAVGCHANGE/AVGCHANGE
         
         
         
