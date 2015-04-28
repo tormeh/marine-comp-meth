@@ -6,7 +6,8 @@
 \begin_preamble
 \lstset{
 numbers=left,
-frame=single}
+frame=single
+breaklines=true}
 \end_preamble
 \use_default_options true
 \maintain_unincluded_children false
@@ -262,6 +263,171 @@ Let ut consider each in isolation.
 \end_layout
 
 \begin_layout Standard
+Side options:
+\end_layout
+
+\begin_layout Enumerate
+Approximate 
+\begin_inset Formula $\varphi(x,y)$
+\end_inset
+
+ to be linear on the border, assuming that the outer points (
+\begin_inset Formula $x=1$
+\end_inset
+
+ etc.) are the border.
+ Since 
+\begin_inset Formula $\frac{d\varphi}{dn}=0$
+\end_inset
+
+ we get that the two neighbours in the 
+\begin_inset Formula $n$
+\end_inset
+
+ direction of a boundary point are equal to that point.
+ This changes the math from (1) a bit.
+ Assuming (x,y) is on the left border(
+\begin_inset Formula $x=0$
+\end_inset
+
+):
+\begin_inset Formula 
+\begin{eqnarray}
+(\varphi(x+h,y)+\varphi(x-h,y)+\varphi(x,y+h)+\varphi(x,y-h)-4\varphi(x,y))/h\text{²} & = & f(x,y)\\
+(\varphi(x,y)+\varphi(x,y)+\varphi(x,y+h)+\varphi(x,y-h)-4\varphi(x,y))/h\text{²} & = & f(x,y)\nonumber \\
+(\varphi(x,y+h)+\varphi(x,y-h)-2\varphi(x,y))/h\text{²} & = & f(x,y)\nonumber \\
+\varphi(x,y+h)+\varphi(x,y-h)-2\varphi(x,y) & = & h\text{²}f(x,y)\nonumber \\
+\varphi(x,y+h)+\varphi(x,y-h)-h\text{²}f(x,y) & = & 2\varphi(x,y)\nonumber \\
+(\varphi(x,y+h)+\varphi(x,y-h)-h\text{²}f(x,y))/2 & = & \varphi(x,y)\nonumber 
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Optionally, we can say that, in order for this to be consistent with how
+ the in-memory matrix actually looks, the boundary point's neighbor inside
+ the matrix is updated along with the boundary point.
+ This means that, for 
+\begin_inset Formula $x=0$
+\end_inset
+
+, after updating 
+\begin_inset Formula $\varphi(x+h,y)==\varphi(x,y)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+This means that the amount of points in any of the two directions is 
+\begin_inset Formula $\frac{1}{h}+1$
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Approximate 
+\begin_inset Formula $\varphi(x,y)$
+\end_inset
+
+ to be linear on the border, assuming that the border lies next to the outer
+ points (
+\begin_inset Formula $x=h/2$
+\end_inset
+
+ etc.).
+ This deviates from the approach hitherto taken in this report, as this
+ idea came fairly late.
+ Since 
+\begin_inset Formula $\frac{d\varphi}{dn}=0$
+\end_inset
+
+ we get that the two neighbours in the 
+\begin_inset Formula $n$
+\end_inset
+
+ direction of a boundary point are equal to that point.
+ This changes the result in (3).
+ Assuming (x,y) is on the left border(
+\begin_inset Formula $x=h/2$
+\end_inset
+
+):
+\begin_inset Formula 
+\begin{eqnarray*}
+(\varphi(x,y+h)+\varphi(x,y-h)+\varphi(x+h,y)-h\text{²}f(x,y))/3 & = & \varphi(x,y)
+\end{eqnarray*}
+
+\end_inset
+
+Let this be the OUTERBORDER strategy
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+This means that the amount of points in any of the two directions is 
+\begin_inset Formula $length=\frac{1}{h}$
+\end_inset
+
+.
+ We can derive this from
+\begin_inset Formula 
+\begin{eqnarray*}
+h & = & \frac{1-2\frac{h}{2}}{length-1}\\
+length-1 & = & \frac{1-2\frac{h}{2}}{h}\\
+length & = & \frac{1-2\frac{h}{2}}{h}+1\\
+length & = & \frac{1-h}{h}+\frac{h}{h}\\
+length & = & \frac{1}{h}
+\end{eqnarray*}
+
+\end_inset
+
+Explanation: At the right-hand side we see
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+1: This is the distance between the borders
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $2\frac{h}{2}$
+\end_inset
+
+: This is the distance lost because the two outer points each need 
+\begin_inset Formula $\frac{h}{2}$
+\end_inset
+
+ units of distance between themselves and the border
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $length-1$
+\end_inset
+
+: 
+\begin_inset Quotes eld
+\end_inset
+
+length
+\begin_inset Quotes erd
+\end_inset
+
+ is the amount of points in a direction.
+ We subtract one because if you part a bread in three, there will be only
+ two closest-piece-to-closest-piece distances between them if you line them
+ up.
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout Standard
 Corner options:
 \end_layout
 
@@ -320,9 +486,9 @@ In the same way, we can say that the points near the origin will have
  be pretty close to zero and we can set this at the start of each iteration:
 \begin_inset Formula 
 \begin{eqnarray*}
-\varphi(0,1) & = & 0\\
-\varphi(1,0) & = & 0\\
-\varphi(1,1) & = & 0
+\varphi(0,h) & = & 0\\
+\varphi(h,0) & = & 0\\
+\varphi(h,h) & = & 0
 \end{eqnarray*}
 
 \end_inset
@@ -332,160 +498,17 @@ Let this be the RESET strategy
 
 \end_deeper
 \begin_layout Enumerate
-Approximate 
-\begin_inset Formula $\varphi(x,y)$
-\end_inset
-
- to be quadratic in the corner.
- Since 
-\begin_inset Formula $\frac{d\varphi}{dn}=0$
-\end_inset
-
- we get that the two neighbours per direction of the boundary point are
- equal to each other, independent of the border point itself.
- Assuming (x,y) is in the top right corner (
-\begin_inset Formula $(x,y)=(max,max)$
+In accordance with the OUTERBORDER strategy outlined above, we handle the
+ corners similarly.
+ For the upper right corner (
+\begin_inset Formula $\varphi(1-h/2,1-h/2)$
 \end_inset
 
 ):
 \begin_inset Formula 
-\begin{eqnarray}
-(\varphi(x+h,y)+\varphi(x-h,y)+\varphi(x,y+h)+\varphi(x,y-h)-4\varphi(x,y))/h\text{²} & = & f(x,y)\\
-(\varphi(x-h,y)+\varphi(x-h,y)+\varphi(x,y-h)+\varphi(x,y-h)-4\varphi(x,y))/h\text{²} & = & f(x,y)\nonumber \\
-(2\varphi(x-h,y)+2\varphi(x,y-h)-4\varphi(x,y))/h\text{²} & = & f(x,y)\nonumber \\
-(2\varphi(x-h,y)+2\varphi(x,y-h)-h\text{²}f(x,y))/4 & = & \varphi(x,y)\nonumber 
-\end{eqnarray}
-
-\end_inset
-
-
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-We can use this to special effect on the origin, since we know that 
-\begin_inset Formula $\varphi(0,0)=0$
-\end_inset
-
-:
-\begin_inset Formula 
-\begin{eqnarray*}
-(2\varphi(h,0)+2\varphi(0,h)-h\text{²}f(0,0))/4 & = & 0\\
-2\varphi(h,0)+2\varphi(0,h)-h\text{²}f(0,0) & = & 0\\
-\varphi(h,0) & = & (h\text{²}f(0,0)-2\varphi(0,h))/2\\
-\varphi(0,h) & = & (h\text{²}f(0,0)-2\varphi(h,0))/2
-\end{eqnarray*}
-
-\end_inset
-
-This is circular, though, and makes the two right-angle neighbors to the
- origin completely independent of the rest of the matrix, which is clearly
- unfortunate.
- It can be used as a hint at the start of each iteration, where we can set
- (0,h) and (h,0) using each other's pre-set values.
- It can also be used for 
-\begin_inset Formula $\varphi(h,h)$
-\end_inset
-
-:
-\begin_inset Formula 
-\begin{eqnarray*}
-\varphi(h,h) & = & (\varphi(2h,h)+(h\text{²}f(0,0)-2\varphi(h,0))/2+\varphi(h,2h)+(h\text{²}f(0,0)-2\varphi(0,h))/2-h\text{²}f(x,y))/4
-\end{eqnarray*}
-
-\end_inset
-
-For further discussion, this will be called the ORIGINDEMAND strategy.
-\end_layout
-
-\end_deeper
-\begin_layout Standard
-Side options:
-\end_layout
-
-\begin_layout Enumerate
-Approximate 
-\begin_inset Formula $\varphi(x,y)$
-\end_inset
-
- to be linear on the border.
- Since 
-\begin_inset Formula $\frac{d\varphi}{dn}=0$
-\end_inset
-
- we get that the two neighbours in the 
-\begin_inset Formula $n$
-\end_inset
-
- direction of a boundary point are equal to that point.
- This changes the math from (1) a bit.
- Assuming (x,y) is on the left border(
-\begin_inset Formula $x=0$
-\end_inset
-
-):
-\begin_inset Formula 
-\begin{eqnarray}
-(\varphi(x+h,y)+\varphi(x-h,y)+\varphi(x,y+h)+\varphi(x,y-h)-4\varphi(x,y))/h\text{²} & = & f(x,y)\\
-(\varphi(x,y)+\varphi(x,y)+\varphi(x,y+h)+\varphi(x,y-h)-4\varphi(x,y))/h\text{²} & = & f(x,y)\nonumber \\
-(\varphi(x,y+h)+\varphi(x,y-h)-2\varphi(x,y))/h\text{²} & = & f(x,y)\nonumber \\
-\varphi(x,y+h)+\varphi(x,y-h)-2\varphi(x,y) & = & h\text{²}f(x,y)\nonumber \\
-\varphi(x,y+h)+\varphi(x,y-h)-h\text{²}f(x,y) & = & 2\varphi(x,y)\nonumber \\
-(\varphi(x,y+h)+\varphi(x,y-h)-h\text{²}f(x,y))/2 & = & \varphi(x,y)\nonumber 
-\end{eqnarray}
-
-\end_inset
-
-
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-Optionally, we can say that, in order for this to be consistent with how
- the in-memory matrix actually looks, the boundary point's neighbor inside
- the matrix is updated along with the boundary point.
- This means that, for 
-\begin_inset Formula $x=0$
-\end_inset
-
-, after updating 
-\begin_inset Formula $\varphi(x+h,y)==\varphi(x,y)$
-\end_inset
-
-.
-\end_layout
-
-\end_deeper
-\begin_layout Enumerate
-Approximate 
-\begin_inset Formula $\varphi(x,y)$
-\end_inset
-
- to be quadratic on the border.
- Since 
-\begin_inset Formula $\frac{d\varphi}{dn}=0$
-\end_inset
-
- we get that the two neighbours in the 
-\begin_inset Formula $n$
-\end_inset
-
- direction of a boundary point are equal to each other, independent of the
- border point itself.
- Assuming (x,y) is on the left border(
-\begin_inset Formula $x=0$
-\end_inset
-
-):
-\begin_inset Formula 
-\begin{eqnarray}
-(\varphi(x+h,y)+\varphi(x-h,y)+\varphi(x,y+h)+\varphi(x,y-h)-4\varphi(x,y))/h\text{²} & = & f(x,y)\\
-(\varphi(x+h,y)+\varphi(x+h,y)+\varphi(x,y+h)+\varphi(x,y-h)-4\varphi(x,y))/h\text{²} & = & f(x,y)\nonumber \\
-(2\varphi(x+h,y)+\varphi(x,y+h)+\varphi(x,y-h)-4\varphi(x,y))/h\text{²} & = & f(x,y)\nonumber \\
-2\varphi(x-h,y)+\varphi(x,y+h)+\varphi(x,y-h)-4\varphi(x,y) & = & h\text{²}f(x,y)\nonumber \\
-2\varphi(x+h,y)+\varphi(x,y+h)+\varphi(x,y-h)-h\text{²}f(x,y) & = & 4\varphi(x,y)\nonumber \\
-(2\varphi(x+h,y)+\varphi(x,y+h)+\varphi(x,y-h)-h\text{²}f(x,y))/4 & = & \varphi(x,y)\nonumber 
-\end{eqnarray}
+\[
+\varphi(x,y)=(\varphi(x-h,y)+\varphi(x,y-h)-h\text{²}f(x,y))/2
+\]
 
 \end_inset
 
@@ -774,8 +797,8 @@ HIGHESTCHANGEFUN
 \begin_inset Text
 
 \begin_layout Plain Layout
-returns the gighest change in (phi-)value given a new old value, new assignment
- and the previous highest change
+returns the highest change in (phi-)value given new old value, new assignment
+ and previous highest change
 \end_layout
 
 \end_inset
@@ -835,6 +858,7 @@ Here is the most interesting code, which is for the Neumann case
 
 \begin_layout Standard
 \begin_inset listings
+lstparams "language=Fortran"
 inline false
 status open
 
@@ -896,59 +920,13 @@ FUNCTION NEWESTIMATE(X,Y,H,PHIS,LENGTH)
 
 \begin_layout Plain Layout
 
-  REAL :: ORIGINDEMAND
-\end_layout
-
-\begin_layout Plain Layout
-
   IF (X==1 .AND.
  Y==1) THEN
 \end_layout
 
 \begin_layout Plain Layout
 
-    TWO_ONE=(F(1,1,H)**2-2*PHIS(1,2))/2.0
-\end_layout
-
-\begin_layout Plain Layout
-
-    ONE_TWO=(F(1,1,H)**2-2*PHIS(2,1))/2.0
-\end_layout
-
-\begin_layout Plain Layout
-
-    PHIS(1,2)=ONE_TWO
-\end_layout
-
-\begin_layout Plain Layout
-
-    PHIS(2,1)=TWO_ONE
-\end_layout
-
-\begin_layout Plain Layout
-
-    NEWESTIMATE=0.0
-\end_layout
-
-\begin_layout Plain Layout
-
-  ELSE IF (X==2 .AND.
- Y==2) THEN
-\end_layout
-
-\begin_layout Plain Layout
-
-    TWO_ONE=(F(1,1,H)**2-2*PHIS(1,2))/2.0
-\end_layout
-
-\begin_layout Plain Layout
-
-    ONE_TWO=(F(1,1,H)**2-2*PHIS(2,1))/2.0
-\end_layout
-
-\begin_layout Plain Layout
-
-    NEWESTIMATE = (1.0/4.0)*(PHIS(X+1,Y)+PHIS(X,Y+1)+ONE_TWO+TWO_ONE-H*H*F(X,Y,H))
+    NEWESTIMATE = 0.0
 \end_layout
 
 \begin_layout Plain Layout
@@ -959,7 +937,7 @@ FUNCTION NEWESTIMATE(X,Y,H,PHIS,LENGTH)
 
 \begin_layout Plain Layout
 
-    NEWESTIMATE = (PHIS(2,LENGTH-1) + PHIS(2,LENGTH) + PHIS(1,LENGTH-1))/3.0
+    NEWESTIMATE = (1.0/2.0)*(PHIS(X+1,Y)+PHIS(X,Y-1)-H*H*F(X,Y,H))
 \end_layout
 
 \begin_layout Plain Layout
@@ -970,7 +948,7 @@ FUNCTION NEWESTIMATE(X,Y,H,PHIS,LENGTH)
 
 \begin_layout Plain Layout
 
-    NEWESTIMATE = (PHIS(LENGTH-1,2) + PHIS(LENGTH,2) + PHIS(LENGTH-1,1))/3.0
+    NEWESTIMATE = (1.0/2.0)*(PHIS(X-1,Y)+PHIS(X,Y+1)-H*H*F(X,Y,H))
 \end_layout
 
 \begin_layout Plain Layout
@@ -981,8 +959,7 @@ FUNCTION NEWESTIMATE(X,Y,H,PHIS,LENGTH)
 
 \begin_layout Plain Layout
 
-    NEWESTIMATE = (PHIS(LENGTH-1,LENGTH-1) + PHIS(LENGTH-1,LENGTH) + PHIS(LENGTH
-,LENGTH-1))/3.0
+    NEWESTIMATE = (1.0/2.0)*(PHIS(X-1,Y)+PHIS(X,Y-1)-H*H*F(X,Y,H))
 \end_layout
 
 \begin_layout Plain Layout
@@ -992,12 +969,7 @@ FUNCTION NEWESTIMATE(X,Y,H,PHIS,LENGTH)
 
 \begin_layout Plain Layout
 
-    NEWVALUE = (1.0/4.0)*(2*PHIS(X+1,Y)+PHIS(X,Y+1)+PHIS(X,Y-1)-H*H*F(X,Y,H))
-\end_layout
-
-\begin_layout Plain Layout
-
-    NEWESTIMATE = NEWVALUE
+    NEWESTIMATE = (1.0/3.0)*(PHIS(X,Y+1)+PHIS(X,Y-1)+PHIS(X+1,Y)-H*H*F(X,Y,H))
 \end_layout
 
 \begin_layout Plain Layout
@@ -1007,12 +979,7 @@ FUNCTION NEWESTIMATE(X,Y,H,PHIS,LENGTH)
 
 \begin_layout Plain Layout
 
-    NEWVALUE = (1.0/4.0)*(PHIS(X,Y+1)+2*PHIS(X-1,Y)+PHIS(X,Y-1)-H*H*F(X,Y,H))
-\end_layout
-
-\begin_layout Plain Layout
-
-    NEWESTIMATE = NEWVALUE
+    NEWESTIMATE = (1.0/3.0)*(PHIS(X,Y+1)+PHIS(X,Y-1)+PHIS(X-1,Y)-H*H*F(X,Y,H))
 \end_layout
 
 \begin_layout Plain Layout
@@ -1022,12 +989,7 @@ FUNCTION NEWESTIMATE(X,Y,H,PHIS,LENGTH)
 
 \begin_layout Plain Layout
 
-    NEWVALUE = (1.0/4.0)*(PHIS(X+1,Y)+2*PHIS(X,Y+1)+PHIS(X-1,Y)-H*H*F(X,Y,H))
-\end_layout
-
-\begin_layout Plain Layout
-
-    NEWESTIMATE = NEWVALUE
+    NEWESTIMATE = (1.0/3.0)*(PHIS(X+1,Y)+PHIS(X-1,Y)+PHIS(X,Y+1)-H*H*F(X,Y,H))
 \end_layout
 
 \begin_layout Plain Layout
@@ -1037,12 +999,7 @@ FUNCTION NEWESTIMATE(X,Y,H,PHIS,LENGTH)
 
 \begin_layout Plain Layout
 
-    NEWVALUE = (1.0/4.0)*(PHIS(X+1,Y)+PHIS(X-1,Y)+2*PHIS(X,Y-1)-H*H*F(X,Y,H))
-\end_layout
-
-\begin_layout Plain Layout
-
-    NEWESTIMATE = NEWVALUE
+    NEWESTIMATE = (1.0/3.0)*(PHIS(X+1,Y)+PHIS(X-1,Y)+PHIS(X,Y-1)-H*H*F(X,Y,H))
 \end_layout
 
 \begin_layout Plain Layout
@@ -1147,6 +1104,7 @@ And the main loop:
 
 \begin_layout Standard
 \begin_inset listings
+lstparams "language=Fortran"
 inline false
 status open
 
@@ -1157,68 +1115,73 @@ NUMITERATIONS = 0
 
 \begin_layout Plain Layout
 
-!the actual computation is performed here
+  !the actual computation is performed here
 \end_layout
 
 \begin_layout Plain Layout
 
-DO WHILE  ((LOWHIGHESTCHANGE/HIGHESTCHANGE) > 1.00001 .OR.
- (LOWAVGCHANGE/AVGCHANGE) > 1.00001)
+  DO WHILE ((LOWHIGHESTCHANGE/HIGHESTCHANGE) > 1.1 .OR.
+ (LOWAVGCHANGE/AVGCHANGE) > 1.000008)
 \end_layout
 
 \begin_layout Plain Layout
 
-  NUMITERATIONS = NUMITERATIONS + 1
+    NUMITERATIONS = NUMITERATIONS + 1
 \end_layout
 
 \begin_layout Plain Layout
 
-  LOWAVGCHANGE = LOWCHANGE(LOWAVGCHANGE, AVGCHANGE)
+    LOWAVGCHANGE = LOWCHANGE(LOWAVGCHANGE, AVGCHANGE)
 \end_layout
 
 \begin_layout Plain Layout
 
-  LOWHIGHESTCHANGE = LOWCHANGE(LOWHIGHESTCHANGE, HIGHESTCHANGE)
+    LOWHIGHESTCHANGE = LOWCHANGE(LOWHIGHESTCHANGE, HIGHESTCHANGE)
 \end_layout
 
 \begin_layout Plain Layout
 
-  HIGHESTCHANGE = 0.0
+    HIGHESTCHANGE = 0.0
 \end_layout
 
 \begin_layout Plain Layout
 
-  AVGCHANGE = 0.0
+    AVGCHANGE = 0.0
 \end_layout
 
 \begin_layout Plain Layout
 
-  DO J=1,LENGTH
+    DO J=1,LENGTH
 \end_layout
 
 \begin_layout Plain Layout
 
-    DO I=1,LENGTH
+      DO I=1,LENGTH
 \end_layout
 
 \begin_layout Plain Layout
 
-      NEWVALUE = NEWESTIMATE(I,J,H,PHIS,LENGTH)
+          NEWVALUE = NEWESTIMATE(I,J,H,PHIS,LENGTH)
 \end_layout
 
 \begin_layout Plain Layout
 
-      HIGHESTCHANGE = HIGHESTCHANGEFUN(PHIS(I,J),NEWVALUE,HIGHESTCHANGE)
+          HIGHESTCHANGE = HIGHESTCHANGEFUN(PHIS(I,J),NEWVALUE,HIGHESTCHANGE)
 \end_layout
 
 \begin_layout Plain Layout
 
-      AVGCHANGE = AVGCHANGE + ((PHIS(I,J)-NEWVALUE)**2)/SIZE
+          AVGCHANGE = AVGCHANGE + ((PHIS(I,J)-NEWVALUE)**2)/SIZE
 \end_layout
 
 \begin_layout Plain Layout
 
-      PHIS(I,J) = NEWVALUE
+          PHIS(I,J) = NEWVALUE
+\end_layout
+
+\begin_layout Plain Layout
+
+      END DO
 \end_layout
 
 \begin_layout Plain Layout
@@ -1228,12 +1191,32 @@ DO WHILE  ((LOWHIGHESTCHANGE/HIGHESTCHANGE) > 1.00001 .OR.
 
 \begin_layout Plain Layout
 
-  END DO
+    !WRITE (*,*) "HIGHESTCHANGE IS ", HIGHESTCHANGE
 \end_layout
 
 \begin_layout Plain Layout
 
-END DO
+    !WRITE (*,*) "AVGCHANGE IS ", AVGCHANGE
+\end_layout
+
+\begin_layout Plain Layout
+
+    !WRITE (*,*) "LOWAVGCHANGE IS ", LOWAVGCHANGE
+\end_layout
+
+\begin_layout Plain Layout
+
+    !WRITE (*,*) "LOWHIGHESTCHANGE IS ", LOWHIGHESTCHANGE
+\end_layout
+
+\begin_layout Plain Layout
+
+    !WRITE (*,*) ""
+\end_layout
+
+\begin_layout Plain Layout
+
+  END DO
 \end_layout
 
 \end_inset
@@ -1251,6 +1234,242 @@ array
 \end_inset
 
  example.
+ What's changed is the function that gets the height of the points
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=C"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+static float
+\end_layout
+
+\begin_layout Plain Layout
+
+getinm(float x, float y, float minx, float maxx, float miny, float maxy)
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+  int i = ((x+(-minx))/(maxx-minx))*LENGTH;
+\end_layout
+
+\begin_layout Plain Layout
+
+  int j = ((y+(-miny))/(maxy-miny))*LENGTH;
+\end_layout
+
+\begin_layout Plain Layout
+
+  int index = i*LENGTH+j;
+\end_layout
+
+\begin_layout Plain Layout
+
+  if(index<0){index=0;}
+\end_layout
+
+\begin_layout Plain Layout
+
+  if(index>LENGTH*LENGTH){index=LENGTH*LENGTH-1;}
+\end_layout
+
+\begin_layout Plain Layout
+
+  //printf("x is %f, y is %f, i is %d, j is %d, index is %d
+\backslash
+n",x,y,i,j,index);            //disabled for better performance
+\end_layout
+
+\begin_layout Plain Layout
+
+  return inm[index];
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And the start of the main function, which reads in the data:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=C"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+int
+\end_layout
+
+\begin_layout Plain Layout
+
+main(int argc, char *argv[])
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+  srand(time(NULL));
+\end_layout
+
+\begin_layout Plain Layout
+
+  float in = 0.0;
+\end_layout
+
+\begin_layout Plain Layout
+
+  int control = 0;
+\end_layout
+
+\begin_layout Plain Layout
+
+  
+\end_layout
+
+\begin_layout Plain Layout
+
+  
+\end_layout
+
+\begin_layout Plain Layout
+
+  FILE *f = fopen("results.txt", "r");
+\end_layout
+
+\begin_layout Plain Layout
+
+  fscanf(f,"%d",&LENGTH);
+\end_layout
+
+\begin_layout Plain Layout
+
+  fscanf(f,"%d",&control);
+\end_layout
+
+\begin_layout Plain Layout
+
+  assert(LENGTH==control);
+\end_layout
+
+\begin_layout Plain Layout
+
+  float arr[LENGTH*LENGTH];
+\end_layout
+
+\begin_layout Plain Layout
+
+  inm = &arr;
+\end_layout
+
+\begin_layout Plain Layout
+
+  for(int i=0; i<LENGTH*LENGTH; i++)
+\end_layout
+
+\begin_layout Plain Layout
+
+  {
+\end_layout
+
+\begin_layout Plain Layout
+
+    fscanf(f,"%f",&in);
+\end_layout
+
+\begin_layout Plain Layout
+
+    inm[i] = in;
+\end_layout
+
+\begin_layout Plain Layout
+
+    //inm[i] = rand()%GLmaxdiff;
+\end_layout
+
+\begin_layout Plain Layout
+
+    if (in < lowest)
+\end_layout
+
+\begin_layout Plain Layout
+
+    {
+\end_layout
+
+\begin_layout Plain Layout
+
+      lowest = in;
+\end_layout
+
+\begin_layout Plain Layout
+
+    } 
+\end_layout
+
+\begin_layout Plain Layout
+
+    else if (in > highest)
+\end_layout
+
+\begin_layout Plain Layout
+
+    {
+\end_layout
+
+\begin_layout Plain Layout
+
+      highest = in;
+\end_layout
+
+\begin_layout Plain Layout
+
+    }
+\end_layout
+
+\begin_layout Plain Layout
+
+    //printf("%f
+\backslash
+n", in);
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+  fclose(f);
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Chapter*
@@ -1258,12 +1477,9 @@ Testing
 \end_layout
 
 \begin_layout Standard
-In the end it turned out that whether you approximates the phi at the boundary
- as being linear or quadratic has little effect.
- On, the corners, however, simple averaging gives markedly superior results.
- Setting the four points at the origin and closest to it to zero at each
- iteration start also improves performance.
- The ORIGINDEMAND strategy can be used with equally good results.
+In the end, the OUTERBORDER strategy is markedly superior to anything else
+ by a solid margin.
+ For a convergence criterium, we settled on option 5 from above.
 \end_layout
 
 \begin_layout Standard
@@ -1271,6 +1487,9 @@ For small inter-point distances, the neumann programs are really slow.
  A possible reason is that the constant point at the origin must have the
  consequences of its value propagated through the matrix and this requires
  more iterations, even as each iteration becomes more costly.
+ In the graph below we set the average squared error to be 0.1 and see how
+ long it needs to run to achieve this.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -1289,27 +1508,12 @@ Conclusion, Evaluation and Further Work
 \end_layout
 
 \begin_layout Standard
-The algorithm is way too sensitive to the initial state of the matrix representi
-ng the 
-\begin_inset Formula $\varphi$
-\end_inset
-
- values.
- It's a troublesome problem, but it's hard to know what to do about it.
- Since the pseudorandom numbers used to populate the matrix are deterministic
- and equal at each invocation, some inter-point distances(
-\begin_inset Formula $h$
-\end_inset
-
-) causes the algorithm to choke, producing incorrect results, while others
- prompt a speedy and correct response.
-\end_layout
-
-\begin_layout Standard
 A possible way to speed up the algorithm would be to first do a run with
  large inter-point distance, and then use the result to initialize the bigger
  matrix.
  Unfortunately this has not been tried during the work with this report.
+ I am a bit unsure about the convergence criterium, but I have no better
+ suggestions.
 \end_layout
 
 \begin_layout Chapter
@@ -1374,6 +1578,7 @@ clang -o array array.c shaderutil.c -lGL -lglut -lm -lGLEW -O3
 \end_inset
 
  depending on where the executable is.
+ Use of Clang is of course optional - GCC should work as well.
 \end_layout
 
 \begin_layout Chapter
@@ -1427,15 +1632,17 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
-        XC = (X-1)*H
+        XC = (X-0.5)*H
 \end_layout
 
 \begin_layout Plain Layout
-        YC = (Y-1)*H
+        YC = (Y-0.5)*H
 \end_layout
 
 \begin_layout Plain Layout
-        !F=12-12*XC-12*YC
+        !F=12-12*XC-12*YC                                              
+        !Switch which of these are commented out if you wish to use the
+ other divergence function
 \end_layout
 
 \begin_layout Plain Layout
@@ -1487,15 +1694,17 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
-        XC = (X-1)*H
+        XC = (X-0.5)*H
 \end_layout
 
 \begin_layout Plain Layout
-        YC = (Y-1)*H
+        YC = (Y-0.5)*H
 \end_layout
 
 \begin_layout Plain Layout
-        !ANALYTICAL = 3*XC**2 + 3*YC**2 - 2*XC**3 - 2*YC**3
+        !ANALYTICAL = 3*XC**2 + 3*YC**2 - 2*XC**3 - 2*YC**3            
+       !Switch which of these are commented out if you wish to use the other
+ divergence function
 \end_layout
 
 \begin_layout Plain Layout
@@ -1560,58 +1769,12 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
-        REAL :: ORIGINDEMAND
-\end_layout
-
-\begin_layout Plain Layout
-        REAL :: TWO_ONE
-\end_layout
-
-\begin_layout Plain Layout
-        REAL :: ONE_TWO
-\end_layout
-
-\begin_layout Plain Layout
         IF (X==1 .AND.
  Y==1) THEN
 \end_layout
 
 \begin_layout Plain Layout
-          TWO_ONE=(F(1,1,H)**2-2*PHIS(1,2))/2.0
-\end_layout
-
-\begin_layout Plain Layout
-          ONE_TWO=(F(1,1,H)**2-2*PHIS(2,1))/2.0
-\end_layout
-
-\begin_layout Plain Layout
-          PHIS(1,2)=ONE_TWO
-\end_layout
-
-\begin_layout Plain Layout
-          PHIS(2,1)=TWO_ONE
-\end_layout
-
-\begin_layout Plain Layout
-          NEWESTIMATE=0.0
-\end_layout
-
-\begin_layout Plain Layout
-        ELSE IF (X==2 .AND.
- Y==2) THEN
-\end_layout
-
-\begin_layout Plain Layout
-          TWO_ONE=(F(1,1,H)**2-2*PHIS(1,2))/2.0
-\end_layout
-
-\begin_layout Plain Layout
-          ONE_TWO=(F(1,1,H)**2-2*PHIS(2,1))/2.0
-\end_layout
-
-\begin_layout Plain Layout
-          NEWESTIMATE = (1.0/4.0)*(PHIS(X+1,Y)+PHIS(X,Y+1)+ONE_TWO+TWO_ONE-H*H*F(X
-,Y,H))
+          NEWESTIMATE = 0.0
 \end_layout
 
 \begin_layout Plain Layout
@@ -1620,8 +1783,7 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
-          NEWESTIMATE = (PHIS(2,LENGTH-1) + PHIS(2,LENGTH) + PHIS(1,LENGTH-1))/3.
-0
+          NEWESTIMATE = (1.0/2.0)*(PHIS(X+1,Y)+PHIS(X,Y-1)-H*H*F(X,Y,H))
 \end_layout
 
 \begin_layout Plain Layout
@@ -1630,8 +1792,7 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
-          NEWESTIMATE = (PHIS(LENGTH-1,2) + PHIS(LENGTH,2) + PHIS(LENGTH-1,1))/3.
-0
+          NEWESTIMATE = (1.0/2.0)*(PHIS(X-1,Y)+PHIS(X,Y+1)-H*H*F(X,Y,H))
 \end_layout
 
 \begin_layout Plain Layout
@@ -1640,8 +1801,7 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
-          NEWESTIMATE = (PHIS(LENGTH-1,LENGTH-1) + PHIS(LENGTH-1,LENGTH)
- + PHIS(LENGTH,LENGTH-1))/3.0
+          NEWESTIMATE = (1.0/2.0)*(PHIS(X-1,Y)+PHIS(X,Y-1)-H*H*F(X,Y,H))
 \end_layout
 
 \begin_layout Plain Layout
@@ -1649,12 +1809,8 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
-          NEWVALUE = (1.0/4.0)*(2*PHIS(X+1,Y)+PHIS(X,Y+1)+PHIS(X,Y-1)-H*H*F(X,Y,H)
-)
-\end_layout
-
-\begin_layout Plain Layout
-          NEWESTIMATE = NEWVALUE
+          NEWESTIMATE = (1.0/3.0)*(PHIS(X,Y+1)+PHIS(X,Y-1)+PHIS(X+1,Y)-H*H*F(X,Y,H
+))
 \end_layout
 
 \begin_layout Plain Layout
@@ -1662,12 +1818,8 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
-          NEWVALUE = (1.0/4.0)*(PHIS(X,Y+1)+2*PHIS(X-1,Y)+PHIS(X,Y-1)-H*H*F(X,Y,H)
-)
-\end_layout
-
-\begin_layout Plain Layout
-          NEWESTIMATE = NEWVALUE
+          NEWESTIMATE = (1.0/3.0)*(PHIS(X,Y+1)+PHIS(X,Y-1)+PHIS(X-1,Y)-H*H*F(X,Y,H
+))
 \end_layout
 
 \begin_layout Plain Layout
@@ -1675,12 +1827,8 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
-          NEWVALUE = (1.0/4.0)*(PHIS(X+1,Y)+2*PHIS(X,Y+1)+PHIS(X-1,Y)-H*H*F(X,Y,H)
-)
-\end_layout
-
-\begin_layout Plain Layout
-          NEWESTIMATE = NEWVALUE
+          NEWESTIMATE = (1.0/3.0)*(PHIS(X+1,Y)+PHIS(X-1,Y)+PHIS(X,Y+1)-H*H*F(X,Y,H
+))
 \end_layout
 
 \begin_layout Plain Layout
@@ -1688,12 +1836,8 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
-          NEWVALUE = (1.0/4.0)*(PHIS(X+1,Y)+PHIS(X-1,Y)+2*PHIS(X,Y-1)-H*H*F(X,Y,H)
-)
-\end_layout
-
-\begin_layout Plain Layout
-          NEWESTIMATE = NEWVALUE
+          NEWESTIMATE = (1.0/3.0)*(PHIS(X+1,Y)+PHIS(X-1,Y)+PHIS(X,Y-1)-H*H*F(X,Y,H
+))
 \end_layout
 
 \begin_layout Plain Layout
@@ -1779,7 +1923,7 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
-        !returns the gighest change in (phi-)value given a new old value,
+        !returns the Highest change in (phi-)value given a new old value,
  new assignment and the previous highest change
 \end_layout
 
@@ -1975,11 +2119,11 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
-        REAL, PARAMETER :: H = 0.0105
+        REAL, PARAMETER :: H = 0.01
 \end_layout
 
 \begin_layout Plain Layout
-        INTEGER, PARAMETER :: LENGTH = (1.0/H)+1
+        INTEGER, PARAMETER :: LENGTH = (1.0/H)
 \end_layout
 
 \begin_layout Plain Layout
@@ -2087,11 +2231,11 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
-        !a friendly reminder that the real coordinate is (x-1)*h, not x*h
+        !a friendly reminder that the real coordinate is (x-0.5)*h, not x*h
 \end_layout
 
 \begin_layout Plain Layout
-        WRITE (*,*) "(LENGTH-1)*H IS ", ((LENGTH-1)*H)
+        WRITE (*,*) "(LENGTH-0.5)*H IS ", ((LENGTH-0.5)*H)
 \end_layout
 
 \begin_layout Plain Layout
@@ -2107,7 +2251,9 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
-            PHIS(I,J) = RAND(SEED)*10.0
+            PHIS(I,J) = RAND(SEED)*10.0 !SEED is intentionally uninitialized
+ in the hope of providing some randomness.
+ Sadly, no better solution was found.
 \end_layout
 
 \begin_layout Plain Layout
@@ -2131,8 +2277,8 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
-        DO WHILE      ((LOWHIGHESTCHANGE/HIGHESTCHANGE) > 1.1 .OR.
- (LOWAVGCHANGE/AVGCHANGE) > 1.000008)
+        DO WHILE  ((LOWHIGHESTCHANGE/HIGHESTCHANGE) > 1.0000126 .OR.
+ (LOWAVGCHANGE/AVGCHANGE) > 1.0000365)
 \end_layout
 
 \begin_layout Plain Layout
@@ -2387,172 +2533,214 @@ inline false
 status open
 
 \begin_layout Plain Layout
+
 !gfortran dirichlet.f95 -fimplicit-none -O3 -o dirichlet -fdefault-real-8
  && time ./dirichlet
 \end_layout
 
 \begin_layout Plain Layout
+
       
 \end_layout
 
 \begin_layout Plain Layout
+
       FUNCTION F(X,Y,H)
 \end_layout
 
 \begin_layout Plain Layout
+
         !the right side of the poisson equation
 \end_layout
 
 \begin_layout Plain Layout
+
         INTEGER X,Y
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL H
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL F
 \end_layout
 
 \begin_layout Plain Layout
+
         F=1
 \end_layout
 
 \begin_layout Plain Layout
+
         RETURN
 \end_layout
 
 \begin_layout Plain Layout
+
       END FUNCTION
 \end_layout
 
 \begin_layout Plain Layout
+
            
 \end_layout
 
 \begin_layout Plain Layout
+
       FUNCTION ANALYTICAL(X,Y,H)
 \end_layout
 
 \begin_layout Plain Layout
+
         !computes the analytical solution
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL ANALYTICAL
 \end_layout
 
 \begin_layout Plain Layout
+
         INTEGER :: X
 \end_layout
 
 \begin_layout Plain Layout
+
         INTEGER :: Y
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL :: H
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL :: XC
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL :: YC
 \end_layout
 
 \begin_layout Plain Layout
+
         XC = (X-1)*H
 \end_layout
 
 \begin_layout Plain Layout
+
         YC = (Y-1)*H
 \end_layout
 
 \begin_layout Plain Layout
+
         ANALYTICAL = 0.25*(XC**2+YC**2)
 \end_layout
 
 \begin_layout Plain Layout
+
         RETURN
 \end_layout
 
 \begin_layout Plain Layout
+
       END FUNCTION
 \end_layout
 
 \begin_layout Plain Layout
+
       
 \end_layout
 
 \begin_layout Plain Layout
+
       FUNCTION NEWESTIMATE(X,Y,H,PHIS,LENGTH)
 \end_layout
 
 \begin_layout Plain Layout
+
         !computes the value of ((x-1)*h,(y-h)*h).
  Valid everywhere.
 \end_layout
 
 \begin_layout Plain Layout
+
         INTEGER X
 \end_layout
 
 \begin_layout Plain Layout
+
         INTEGER  Y
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL H
 \end_layout
 
 \begin_layout Plain Layout
+
         INTEGER LENGTH
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL NEWVALUE
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL :: PHIS(LENGTH,LENGTH)
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL NEWESTIMATE
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL SIMPLEESTIMATE
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL F
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL :: ORIGINDEMAND
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL :: XC
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL :: YC
 \end_layout
 
 \begin_layout Plain Layout
+
         XC = (X-1)*H
 \end_layout
 
 \begin_layout Plain Layout
+
         YC = (Y-1)*H
 \end_layout
 
 \begin_layout Plain Layout
+
         IF (X==1 .OR.
  Y==1 .OR.
  X==LENGTH .OR.
@@ -2560,629 +2748,780 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
+
           NEWESTIMATE = 0.25*(XC**2+YC**2)
 \end_layout
 
 \begin_layout Plain Layout
+
         ELSE
 \end_layout
 
 \begin_layout Plain Layout
+
           NEWESTIMATE = SIMPLEESTIMATE(X,Y,H,PHIS,LENGTH)
 \end_layout
 
 \begin_layout Plain Layout
+
         END IF
 \end_layout
 
 \begin_layout Plain Layout
+
         RETURN
 \end_layout
 
 \begin_layout Plain Layout
+
       END FUNCTION
 \end_layout
 
 \begin_layout Plain Layout
+
            
 \end_layout
 
 \begin_layout Plain Layout
+
       
 \end_layout
 
 \begin_layout Plain Layout
+
       FUNCTION SIMPLEESTIMATE(X,Y,H,PHIS,LENGTH)
 \end_layout
 
 \begin_layout Plain Layout
+
         !computes a new estimate for the value of (x*h,y*h).
  Not valid on the boundary
 \end_layout
 
 \begin_layout Plain Layout
+
         INTEGER X,Y
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL H
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL SIMPLEESTIMATE
 \end_layout
 
 \begin_layout Plain Layout
+
         INTEGER LENGTH
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL F
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL :: PHIS(LENGTH,LENGTH)
 \end_layout
 
 \begin_layout Plain Layout
+
         SIMPLEESTIMATE = (1.0/4.0)*(PHIS(X+1,Y)+PHIS(X,Y+1)+PHIS(X-1,Y)+PHIS(X,Y-1
 )-H*H*F(X,Y,H))
 \end_layout
 
 \begin_layout Plain Layout
+
         RETURN
 \end_layout
 
 \begin_layout Plain Layout
+
       END FUNCTION
 \end_layout
 
 \begin_layout Plain Layout
+
       
 \end_layout
 
 \begin_layout Plain Layout
+
       FUNCTION HIGHESTCHANGEFUN(OLD,NEW,PREVHIGHEST)
 \end_layout
 
 \begin_layout Plain Layout
+
         !returns the gighest change in (phi-)value given a new old value,
  new assignment and the previous highest change
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL :: OLD
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL :: NEW
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL :: PREVHIGHEST
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL :: CHANGE
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL HIGHESTCHANGEFUN
 \end_layout
 
 \begin_layout Plain Layout
+
         CHANGE = ABS(OLD-NEW)
 \end_layout
 
 \begin_layout Plain Layout
+
         IF (CHANGE .GE.
  PREVHIGHEST) THEN
 \end_layout
 
 \begin_layout Plain Layout
+
           HIGHESTCHANGEFUN = CHANGE
 \end_layout
 
 \begin_layout Plain Layout
+
         ELSE
 \end_layout
 
 \begin_layout Plain Layout
+
           HIGHESTCHANGEFUN = PREVHIGHEST
 \end_layout
 
 \begin_layout Plain Layout
+
         END IF
 \end_layout
 
 \begin_layout Plain Layout
+
         RETURN
 \end_layout
 
 \begin_layout Plain Layout
+
       END FUNCTION
 \end_layout
 
 \begin_layout Plain Layout
+
       
 \end_layout
 
 \begin_layout Plain Layout
+
       FUNCTION LOWCHANGE(OLDLOWEST, LASTLOW)
 \end_layout
 
 \begin_layout Plain Layout
+
         !returns the lesser of two variables.
  Intended to compare change magnitudes to determine the lowest one.
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL LOWCHANGE
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL OLDLOWEST
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL LASTLOW
 \end_layout
 
 \begin_layout Plain Layout
+
         IF (OLDLOWEST .LT.
  LASTLOW) THEN
 \end_layout
 
 \begin_layout Plain Layout
+
           LOWCHANGE = OLDLOWEST
 \end_layout
 
 \begin_layout Plain Layout
+
         ELSE
 \end_layout
 
 \begin_layout Plain Layout
+
           LOWCHANGE = LASTLOW
 \end_layout
 
 \begin_layout Plain Layout
+
         END IF
 \end_layout
 
 \begin_layout Plain Layout
+
       END FUNCTION
 \end_layout
 
 \begin_layout Plain Layout
+
       
 \end_layout
 
 \begin_layout Plain Layout
+
       FUNCTION ANALYTICALERROR(PHIS,LENGTH,H,SIZE)
 \end_layout
 
 \begin_layout Plain Layout
+
         !computes the analytically determined average squared error
 \end_layout
 
 \begin_layout Plain Layout
+
         INTEGER SIZE
 \end_layout
 
 \begin_layout Plain Layout
+
         INTEGER LENGTH
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL H
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL :: PHIS(LENGTH,LENGTH)
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL ANALYTICAL
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL AVGERROR
 \end_layout
 
 \begin_layout Plain Layout
+
         INTEGER I,J
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL ANALYTICALERROR
 \end_layout
 
 \begin_layout Plain Layout
+
         AVGERROR = 0.0
 \end_layout
 
 \begin_layout Plain Layout
+
         DO J=1,LENGTH
 \end_layout
 
 \begin_layout Plain Layout
+
           DO I=1,LENGTH
 \end_layout
 
 \begin_layout Plain Layout
+
           AVGERROR = AVGERROR + ((PHIS(I,J)-ANALYTICAL(I,J,H))**2)/SIZE
 \end_layout
 
 \begin_layout Plain Layout
+
           END DO
 \end_layout
 
 \begin_layout Plain Layout
+
         END DO
 \end_layout
 
 \begin_layout Plain Layout
+
         ANALYTICALERROR = AVGERROR
 \end_layout
 
 \begin_layout Plain Layout
+
         RETURN
 \end_layout
 
 \begin_layout Plain Layout
+
       END FUNCTION
 \end_layout
 
 \begin_layout Plain Layout
+
       
 \end_layout
 
 \begin_layout Plain Layout
+
       PROGRAM SOLVER
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL, PARAMETER :: H = 0.01
 \end_layout
 
 \begin_layout Plain Layout
+
         INTEGER, PARAMETER :: LENGTH = (1.0/H)+1
 \end_layout
 
 \begin_layout Plain Layout
+
         INTEGER, PARAMETER :: SIZE = LENGTH*LENGTH
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL :: PHIS(LENGTH, LENGTH)
 \end_layout
 
 \begin_layout Plain Layout
+
         INTEGER, PARAMETER :: out_unit=20
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL :: HIGHESTCHANGE
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL :: NEWVALUE
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL SIMPLEESTIMATE
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL NEWESTIMATE
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL ANALYTICAL
 \end_layout
 
 \begin_layout Plain Layout
+
         INTEGER I,J
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL HIGHESTCHANGEFUN
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL LOWHIGHESTCHANGE
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL AVGCHANGE
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL LOWAVGCHANGE
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL LOWCHANGE
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL AVGERROR
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL NUMAVGERROR
 \end_layout
 
 \begin_layout Plain Layout
+
         INTEGER NUMITERATIONS
 \end_layout
 
 \begin_layout Plain Layout
+
         REAL ANALYTICALERROR
 \end_layout
 
 \begin_layout Plain Layout
+
         LOWAVGCHANGE = 20.0
 \end_layout
 
 \begin_layout Plain Layout
+
         AVGCHANGE = 1.0
 \end_layout
 
 \begin_layout Plain Layout
+
         LOWHIGHESTCHANGE = 20.0
 \end_layout
 
 \begin_layout Plain Layout
+
         HIGHESTCHANGE = 10.0
 \end_layout
 
 \begin_layout Plain Layout
+
         
 \end_layout
 
 \begin_layout Plain Layout
+
         !a friendly reminder that what the real coordinate is (x-1)*h, not
  x*h
 \end_layout
 
 \begin_layout Plain Layout
+
         WRITE (*,*) "(LENGTH-1)*H IS ", ((LENGTH-1)*H)
 \end_layout
 
 \begin_layout Plain Layout
+
         
 \end_layout
 
 \begin_layout Plain Layout
+
         DO I=1,LENGTH
 \end_layout
 
 \begin_layout Plain Layout
+
           DO J=1,LENGTH
 \end_layout
 
 \begin_layout Plain Layout
+
             PHIS(I,J) = RAND(0)*10
 \end_layout
 
 \begin_layout Plain Layout
+
           END DO
 \end_layout
 
 \begin_layout Plain Layout
+
         END DO
 \end_layout
 
 \begin_layout Plain Layout
+
         
 \end_layout
 
 \begin_layout Plain Layout
+
         NUMITERATIONS = 0
 \end_layout
 
 \begin_layout Plain Layout
+
         !the actual computation is performed here
 \end_layout
 
 \begin_layout Plain Layout
+
         DO WHILE  ((LOWHIGHESTCHANGE/HIGHESTCHANGE) > 1.00001 .OR.
- (LOWAVGCHANGE/AVGCHANGE) > 1.00001) !(NUMITERATIONS < 200000) !(ANALYTICALERROR(
-PHIS,LENGTH,H,SIZE)>0.000000006)! !((SIMPLEESTIMATE(2,2,H,PHIS,LENGTH)-0)**2>0.000
-01)!
+ (LOWAVGCHANGE/AVGCHANGE) > 1.00001)
 \end_layout
 
 \begin_layout Plain Layout
+
           NUMITERATIONS = NUMITERATIONS + 1
 \end_layout
 
 \begin_layout Plain Layout
+
           LOWAVGCHANGE = LOWCHANGE(LOWAVGCHANGE, AVGCHANGE)
 \end_layout
 
 \begin_layout Plain Layout
+
           LOWHIGHESTCHANGE = LOWCHANGE(LOWHIGHESTCHANGE, HIGHESTCHANGE)
 \end_layout
 
 \begin_layout Plain Layout
+
           HIGHESTCHANGE = 0.0
 \end_layout
 
 \begin_layout Plain Layout
+
           AVGCHANGE = 0.0
 \end_layout
 
 \begin_layout Plain Layout
+
           DO J=1,LENGTH
 \end_layout
 
 \begin_layout Plain Layout
+
             DO I=1,LENGTH
 \end_layout
 
 \begin_layout Plain Layout
+
                 NEWVALUE = NEWESTIMATE(I,J,H,PHIS,LENGTH)
 \end_layout
 
 \begin_layout Plain Layout
+
                 HIGHESTCHANGE = HIGHESTCHANGEFUN(PHIS(I,J),NEWVALUE,HIGHESTCHANG
 E)
 \end_layout
 
 \begin_layout Plain Layout
+
                 AVGCHANGE = AVGCHANGE + ((PHIS(I,J)-NEWVALUE)**2)/SIZE
 \end_layout
 
 \begin_layout Plain Layout
+
                 PHIS(I,J) = NEWVALUE
 \end_layout
 
 \begin_layout Plain Layout
+
             END DO
 \end_layout
 
 \begin_layout Plain Layout
+
           END DO
 \end_layout
 
 \begin_layout Plain Layout
+
         END DO
 \end_layout
 
 \begin_layout Plain Layout
+
         
 \end_layout
 
 \begin_layout Plain Layout
+
         
 \end_layout
 
 \begin_layout Plain Layout
+
         
 \end_layout
 
 \begin_layout Plain Layout
+
         WRITE (*,*) "NUMITERATIONS IS ", NUMITERATIONS
 \end_layout
 
 \begin_layout Plain Layout
+
         !finds and prints the numerically determined error
 \end_layout
 
 \begin_layout Plain Layout
+
         NUMAVGERROR = 0.0
 \end_layout
 
 \begin_layout Plain Layout
+
         DO I=1,LENGTH
 \end_layout
 
 \begin_layout Plain Layout
+
           DO J=1,LENGTH
 \end_layout
 
 \begin_layout Plain Layout
+
           NUMAVGERROR = NUMAVGERROR + ((PHIS(I,J)-NEWESTIMATE(I,J,H,PHIS,LENGTH)
 )**2)/SIZE
 \end_layout
 
 \begin_layout Plain Layout
+
           END DO
 \end_layout
 
 \begin_layout Plain Layout
+
         END DO
 \end_layout
 
 \begin_layout Plain Layout
+
         WRITE (*,*) "AVERAGE SQUARE NUMERICALLY ESTIMATED ERROR IS ", NUMAVGERRO
 R
 \end_layout
 
 \begin_layout Plain Layout
+
         
 \end_layout
 
 \begin_layout Plain Layout
+
         !performance metrics.
  Analytically determined error is printed
 \end_layout
 
 \begin_layout Plain Layout
+
         AVGERROR = 0.0
 \end_layout
 
 \begin_layout Plain Layout
+
         DO I=1,LENGTH
 \end_layout
 
 \begin_layout Plain Layout
+
           DO J=1,LENGTH
 \end_layout
 
 \begin_layout Plain Layout
+
           AVGERROR = AVGERROR + ((PHIS(I,J)-ANALYTICAL(I,J,H))**2)/SIZE
 \end_layout
 
 \begin_layout Plain Layout
+
           END DO
 \end_layout
 
 \begin_layout Plain Layout
+
         END DO
 \end_layout
 
 \begin_layout Plain Layout
+
         WRITE (*,*) "AVERAGE SQUARE ANALYTICALLY DETERMINED ERROR IS ",
  AVGERROR
 \end_layout
 
 \begin_layout Plain Layout
+
         
 \end_layout
 
 \begin_layout Plain Layout
+
         !writes results to file
 \end_layout
 
 \begin_layout Plain Layout
+
         open (unit=out_unit,file="results.txt",action="write",status="replace")
 \end_layout
 
 \begin_layout Plain Layout
+
         WRITE (OUT_UNIT,'(I4)') LENGTH
 \end_layout
 
 \begin_layout Plain Layout
+
         WRITE (OUT_UNIT,'(I4)') LENGTH
 \end_layout
 
 \begin_layout Plain Layout
+
         DO I=1,LENGTH
 \end_layout
 
 \begin_layout Plain Layout
+
           DO J=1,LENGTH
 \end_layout
 
 \begin_layout Plain Layout
+
               WRITE (OUT_UNIT,'(F0.5)') PHIS(I,J)
 \end_layout
 
 \begin_layout Plain Layout
+
           END DO
 \end_layout
 
 \begin_layout Plain Layout
+
         END DO
 \end_layout
 
 \begin_layout Plain Layout
+
         close (out_unit)
 \end_layout
 
 \begin_layout Plain Layout
+
       END
 \end_layout
 
@@ -3205,6 +3544,7 @@ inline false
 status open
 
 \begin_layout Plain Layout
+
 //clang -o array array.c shaderutil.c -lGL -lglut -lm -lGLEW -O3 && ./array
 \end_layout
 
@@ -3213,22 +3553,27 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
+
 /**
 \end_layout
 
 \begin_layout Plain Layout
+
  * Test variable array indexing in a vertex shader.
 \end_layout
 
 \begin_layout Plain Layout
+
  * Brian Paul
 \end_layout
 
 \begin_layout Plain Layout
+
  * 17 April 2009
 \end_layout
 
 \begin_layout Plain Layout
+
  */
 \end_layout
 
@@ -3237,34 +3582,42 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
+
 #include <assert.h>
 \end_layout
 
 \begin_layout Plain Layout
+
 #include <string.h>
 \end_layout
 
 \begin_layout Plain Layout
+
 #include <stdio.h>
 \end_layout
 
 \begin_layout Plain Layout
+
 #include <stdlib.h>
 \end_layout
 
 \begin_layout Plain Layout
+
 #include <math.h>
 \end_layout
 
 \begin_layout Plain Layout
+
 #include <GL/glew.h>
 \end_layout
 
 \begin_layout Plain Layout
+
 #include "glut_wrap.h"
 \end_layout
 
 \begin_layout Plain Layout
+
 #include "shaderutil.h"
 \end_layout
 
@@ -3273,22 +3626,27 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
+
 int LENGTH;
 \end_layout
 
 \begin_layout Plain Layout
+
 float *inm;
 \end_layout
 
 \begin_layout Plain Layout
+
 #define GLmaxdiff 2.0
 \end_layout
 
 \begin_layout Plain Layout
+
 float highest = 0.0;
 \end_layout
 
 \begin_layout Plain Layout
+
 float lowest = 0.0;
 \end_layout
 
@@ -3297,80 +3655,95 @@ float lowest = 0.0;
 \end_layout
 
 \begin_layout Plain Layout
+
 /**
 \end_layout
 
 \begin_layout Plain Layout
+
  * The vertex position.z is used as a (variable) index into an
 \end_layout
 
 \begin_layout Plain Layout
+
  * array which returns a new Z value.
 \end_layout
 
 \begin_layout Plain Layout
+
  */
 \end_layout
 
 \begin_layout Plain Layout
+
 static const char *VertShaderText =
 \end_layout
 
 \begin_layout Plain Layout
+
    "uniform sampler2D tex1; 
 \backslash
 n"
 \end_layout
 
 \begin_layout Plain Layout
+
    "uniform float HeightArray[20]; 
 \backslash
 n"
 \end_layout
 
 \begin_layout Plain Layout
+
    "void main() 
 \backslash
 n"
 \end_layout
 
 \begin_layout Plain Layout
+
    "{ 
 \backslash
 n"
 \end_layout
 
 \begin_layout Plain Layout
+
    "   vec4 pos = gl_Vertex; 
 \backslash
 n"
 \end_layout
 
 \begin_layout Plain Layout
+
    "   int i = int(pos.z * 9.5); 
 \backslash
 n"
 \end_layout
 
 \begin_layout Plain Layout
+
    "   pos.z = HeightArray[i]; 
 \backslash
 n"
 \end_layout
 
 \begin_layout Plain Layout
+
    "   gl_Position = gl_ModelViewProjectionMatrix * pos; 
 \backslash
 n"
 \end_layout
 
 \begin_layout Plain Layout
+
    "   gl_FrontColor = pos; 
 \backslash
 n"
 \end_layout
 
 \begin_layout Plain Layout
+
    "} 
 \backslash
 n";
@@ -3381,28 +3754,33 @@ n";
 \end_layout
 
 \begin_layout Plain Layout
+
 static const char *FragShaderText =
 \end_layout
 
 \begin_layout Plain Layout
+
    "void main() 
 \backslash
 n"
 \end_layout
 
 \begin_layout Plain Layout
+
    "{ 
 \backslash
 n"
 \end_layout
 
 \begin_layout Plain Layout
+
    "   gl_FragColor = gl_Color; 
 \backslash
 n"
 \end_layout
 
 \begin_layout Plain Layout
+
    "} 
 \backslash
 n";
@@ -3417,14 +3795,17 @@ n";
 \end_layout
 
 \begin_layout Plain Layout
+
 static GLuint fragShader;
 \end_layout
 
 \begin_layout Plain Layout
+
 static GLuint vertShader;
 \end_layout
 
 \begin_layout Plain Layout
+
 static GLuint program;
 \end_layout
 
@@ -3433,18 +3814,22 @@ static GLuint program;
 \end_layout
 
 \begin_layout Plain Layout
+
 static GLint win = 0;
 \end_layout
 
 \begin_layout Plain Layout
+
 static GLboolean Anim = GL_TRUE;
 \end_layout
 
 \begin_layout Plain Layout
+
 static GLboolean WireFrame = GL_TRUE;
 \end_layout
 
 \begin_layout Plain Layout
+
 static GLfloat xRot = -70.0f, yRot = 0.0f, zRot = 0.0f;
 \end_layout
 
@@ -3457,26 +3842,32 @@ static GLfloat xRot = -70.0f, yRot = 0.0f, zRot = 0.0f;
 \end_layout
 
 \begin_layout Plain Layout
+
 static void
 \end_layout
 
 \begin_layout Plain Layout
+
 Idle(void)
 \end_layout
 
 \begin_layout Plain Layout
+
 {
 \end_layout
 
 \begin_layout Plain Layout
+
    zRot = 90 + glutGet(GLUT_ELAPSED_TIME) * 0.05;
 \end_layout
 
 \begin_layout Plain Layout
+
    glutPostRedisplay();
 \end_layout
 
 \begin_layout Plain Layout
+
 }
 \end_layout
 
@@ -3489,26 +3880,32 @@ Idle(void)
 \end_layout
 
 \begin_layout Plain Layout
+
 /** z=f(x,y) */
 \end_layout
 
 \begin_layout Plain Layout
+
 static float
 \end_layout
 
 \begin_layout Plain Layout
+
 fz(float x, float y)
 \end_layout
 
 \begin_layout Plain Layout
+
 {
 \end_layout
 
 \begin_layout Plain Layout
+
    return fabs(cos(1.5*x) + cos(1.5*y));
 \end_layout
 
 \begin_layout Plain Layout
+
 }
 \end_layout
 
@@ -3517,48 +3914,59 @@ fz(float x, float y)
 \end_layout
 
 \begin_layout Plain Layout
+
 static float
 \end_layout
 
 \begin_layout Plain Layout
+
 getinm(float x, float y, float minx, float maxx, float miny, float maxy)
 \end_layout
 
 \begin_layout Plain Layout
+
 {
 \end_layout
 
 \begin_layout Plain Layout
+
   int i = ((x+(-minx))/(maxx-minx))*LENGTH;
 \end_layout
 
 \begin_layout Plain Layout
+
   int j = ((y+(-miny))/(maxy-miny))*LENGTH;
 \end_layout
 
 \begin_layout Plain Layout
+
   int index = i*LENGTH+j;
 \end_layout
 
 \begin_layout Plain Layout
+
   if(index<0){index=0;}
 \end_layout
 
 \begin_layout Plain Layout
+
   if(index>LENGTH*LENGTH){index=LENGTH*LENGTH-1;}
 \end_layout
 
 \begin_layout Plain Layout
+
   //printf("x is %f, y is %f, i is %d, j is %d, index is %d
 \backslash
 n",x,y,i,j,index);            //disabled for better performance
 \end_layout
 
 \begin_layout Plain Layout
+
   return inm[index];
 \end_layout
 
 \begin_layout Plain Layout
+
 }
 \end_layout
 
@@ -3571,46 +3979,57 @@ n",x,y,i,j,index);            //disabled for better performance
 \end_layout
 
 \begin_layout Plain Layout
+
 static void
 \end_layout
 
 \begin_layout Plain Layout
+
 DrawMesh(void)
 \end_layout
 
 \begin_layout Plain Layout
+
 {
 \end_layout
 
 \begin_layout Plain Layout
+
    GLfloat xmin = -2.0, xmax = 2.0;
 \end_layout
 
 \begin_layout Plain Layout
+
    GLfloat ymin = -2.0, ymax = 2.0;
 \end_layout
 
 \begin_layout Plain Layout
+
    GLuint xdivs = 60, ydivs = 60;
 \end_layout
 
 \begin_layout Plain Layout
+
    GLfloat dx = (xmax - xmin) / xdivs;
 \end_layout
 
 \begin_layout Plain Layout
+
    GLfloat dy = (ymax - ymin) / ydivs;
 \end_layout
 
 \begin_layout Plain Layout
+
    GLfloat ds = 1.0 / xdivs, dt = 1.0 / ydivs;
 \end_layout
 
 \begin_layout Plain Layout
+
    GLfloat x, y, s, t;
 \end_layout
 
 \begin_layout Plain Layout
+
    GLuint i, j;
 \end_layout
 
@@ -3619,42 +4038,52 @@ DrawMesh(void)
 \end_layout
 
 \begin_layout Plain Layout
+
    float scale = GLmaxdiff/(highest-lowest);
 \end_layout
 
 \begin_layout Plain Layout
+
    
 \end_layout
 
 \begin_layout Plain Layout
+
    y = ymin;
 \end_layout
 
 \begin_layout Plain Layout
+
    t = 0.0;
 \end_layout
 
 \begin_layout Plain Layout
+
    for (i = 0; i < ydivs; i++) {
 \end_layout
 
 \begin_layout Plain Layout
+
       x = xmin;
 \end_layout
 
 \begin_layout Plain Layout
+
       s = 0.0;
 \end_layout
 
 \begin_layout Plain Layout
+
       glBegin(GL_QUAD_STRIP);
 \end_layout
 
 \begin_layout Plain Layout
+
       for (j = 0; j < xdivs; j++) {
 \end_layout
 
 \begin_layout Plain Layout
+
          float z0 = scale*getinm(x, y, xmin,xmax,ymin,ymax), z1 = scale*getinm(x
 , y + dy, xmin,xmax,ymin,ymax);
 \end_layout
@@ -3664,10 +4093,12 @@ DrawMesh(void)
 \end_layout
 
 \begin_layout Plain Layout
+
          glTexCoord2f(s, t);
 \end_layout
 
 \begin_layout Plain Layout
+
          glVertex3f(x, y, z0);
 \end_layout
 
@@ -3676,74 +4107,92 @@ DrawMesh(void)
 \end_layout
 
 \begin_layout Plain Layout
+
          glTexCoord2f(s, t + dt);
 \end_layout
 
 \begin_layout Plain Layout
+
          glVertex3f(x, y + dy, z1);
 \end_layout
 
 \begin_layout Plain Layout
+
          x += dx;
 \end_layout
 
 \begin_layout Plain Layout
+
          s += ds;
 \end_layout
 
 \begin_layout Plain Layout
+
       }
 \end_layout
 
 \begin_layout Plain Layout
+
       glEnd();
 \end_layout
 
 \begin_layout Plain Layout
+
       y += dy;
 \end_layout
 
 \begin_layout Plain Layout
+
       t += dt;
 \end_layout
 
 \begin_layout Plain Layout
+
    }
 \end_layout
 
 \begin_layout Plain Layout
+
    
 \end_layout
 
 \begin_layout Plain Layout
+
    /*y = ymin;
 \end_layout
 
 \begin_layout Plain Layout
+
    t = 0.0;
 \end_layout
 
 \begin_layout Plain Layout
+
    for (i = 0; i < ydivs; i++) {
 \end_layout
 
 \begin_layout Plain Layout
+
       x = xmin;
 \end_layout
 
 \begin_layout Plain Layout
+
       s = 0.0;
 \end_layout
 
 \begin_layout Plain Layout
+
       glBegin(GL_QUAD_STRIP);
 \end_layout
 
 \begin_layout Plain Layout
+
       for (j = 0; j < xdivs; j++) {
 \end_layout
 
 \begin_layout Plain Layout
+
          float z0 = fz(x, y), z1 = fz(x, y + dy);
 \end_layout
 
@@ -3752,10 +4201,12 @@ DrawMesh(void)
 \end_layout
 
 \begin_layout Plain Layout
+
          glTexCoord2f(s, t);
 \end_layout
 
 \begin_layout Plain Layout
+
          glVertex3f(x, y, z0);
 \end_layout
 
@@ -3764,42 +4215,52 @@ DrawMesh(void)
 \end_layout
 
 \begin_layout Plain Layout
+
          glTexCoord2f(s, t + dt);
 \end_layout
 
 \begin_layout Plain Layout
+
          glVertex3f(x, y + dy, z1);
 \end_layout
 
 \begin_layout Plain Layout
+
          x += dx;
 \end_layout
 
 \begin_layout Plain Layout
+
          s += ds;
 \end_layout
 
 \begin_layout Plain Layout
+
       }
 \end_layout
 
 \begin_layout Plain Layout
+
       glEnd();
 \end_layout
 
 \begin_layout Plain Layout
+
       y += dy;
 \end_layout
 
 \begin_layout Plain Layout
+
       t += dt;
 \end_layout
 
 \begin_layout Plain Layout
+
    }*/
 \end_layout
 
 \begin_layout Plain Layout
+
 }
 \end_layout
 
@@ -3812,38 +4273,47 @@ DrawMesh(void)
 \end_layout
 
 \begin_layout Plain Layout
+
 static void
 \end_layout
 
 \begin_layout Plain Layout
+
 Redisplay(void)
 \end_layout
 
 \begin_layout Plain Layout
+
 {
 \end_layout
 
 \begin_layout Plain Layout
+
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 \end_layout
 
 \begin_layout Plain Layout
+
    
 \end_layout
 
 \begin_layout Plain Layout
+
    if (WireFrame)
 \end_layout
 
 \begin_layout Plain Layout
+
       glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 \end_layout
 
 \begin_layout Plain Layout
+
    else
 \end_layout
 
 \begin_layout Plain Layout
+
       glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 \end_layout
 
@@ -3852,18 +4322,22 @@ Redisplay(void)
 \end_layout
 
 \begin_layout Plain Layout
+
    glPushMatrix();
 \end_layout
 
 \begin_layout Plain Layout
+
    glRotatef(xRot, 1.0f, 0.0f, 0.0f);
 \end_layout
 
 \begin_layout Plain Layout
+
    glRotatef(yRot, 0.0f, 1.0f, 0.0f);
 \end_layout
 
 \begin_layout Plain Layout
+
    glRotatef(zRot, 0.0f, 0.0f, 1.0f);
 \end_layout
 
@@ -3872,14 +4346,17 @@ Redisplay(void)
 \end_layout
 
 \begin_layout Plain Layout
+
    glPushMatrix();
 \end_layout
 
 \begin_layout Plain Layout
+
    DrawMesh();
 \end_layout
 
 \begin_layout Plain Layout
+
    glPopMatrix();
 \end_layout
 
@@ -3888,6 +4365,7 @@ Redisplay(void)
 \end_layout
 
 \begin_layout Plain Layout
+
    glPopMatrix();
 \end_layout
 
@@ -3896,6 +4374,7 @@ Redisplay(void)
 \end_layout
 
 \begin_layout Plain Layout
+
    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 \end_layout
 
@@ -3904,10 +4383,12 @@ Redisplay(void)
 \end_layout
 
 \begin_layout Plain Layout
+
    glutSwapBuffers();
 \end_layout
 
 \begin_layout Plain Layout
+
 }
 \end_layout
 
@@ -3920,46 +4401,57 @@ Redisplay(void)
 \end_layout
 
 \begin_layout Plain Layout
+
 static void
 \end_layout
 
 \begin_layout Plain Layout
+
 Reshape(int width, int height)
 \end_layout
 
 \begin_layout Plain Layout
+
 {
 \end_layout
 
 \begin_layout Plain Layout
+
    glViewport(0, 0, width, height);
 \end_layout
 
 \begin_layout Plain Layout
+
    glMatrixMode(GL_PROJECTION);
 \end_layout
 
 \begin_layout Plain Layout
+
    glLoadIdentity();
 \end_layout
 
 \begin_layout Plain Layout
+
    glFrustum(-1.0, 1.0, -1.0, 1.0, 5.0, 25.0);
 \end_layout
 
 \begin_layout Plain Layout
+
    glMatrixMode(GL_MODELVIEW);
 \end_layout
 
 \begin_layout Plain Layout
+
    glLoadIdentity();
 \end_layout
 
 \begin_layout Plain Layout
+
    glTranslatef(0.0f, 0.0f, -15.0f);
 \end_layout
 
 \begin_layout Plain Layout
+
 }
 \end_layout
 
@@ -3972,34 +4464,42 @@ Reshape(int width, int height)
 \end_layout
 
 \begin_layout Plain Layout
+
 static void
 \end_layout
 
 \begin_layout Plain Layout
+
 CleanUp(void)
 \end_layout
 
 \begin_layout Plain Layout
+
 {
 \end_layout
 
 \begin_layout Plain Layout
+
    glDeleteShader(fragShader);
 \end_layout
 
 \begin_layout Plain Layout
+
    glDeleteShader(vertShader);
 \end_layout
 
 \begin_layout Plain Layout
+
    glDeleteProgram(program);
 \end_layout
 
 \begin_layout Plain Layout
+
    glutDestroyWindow(win);
 \end_layout
 
 \begin_layout Plain Layout
+
 }
 \end_layout
 
@@ -4012,26 +4512,32 @@ CleanUp(void)
 \end_layout
 
 \begin_layout Plain Layout
+
 static void
 \end_layout
 
 \begin_layout Plain Layout
+
 Key(unsigned char key, int x, int y)
 \end_layout
 
 \begin_layout Plain Layout
+
 {
 \end_layout
 
 \begin_layout Plain Layout
+
    const GLfloat step = 2.0;
 \end_layout
 
 \begin_layout Plain Layout
+
    (void) x;
 \end_layout
 
 \begin_layout Plain Layout
+
    (void) y;
 \end_layout
 
@@ -4040,98 +4546,122 @@ Key(unsigned char key, int x, int y)
 \end_layout
 
 \begin_layout Plain Layout
+
    switch(key) {
 \end_layout
 
 \begin_layout Plain Layout
+
    case 'a':
 \end_layout
 
 \begin_layout Plain Layout
+
       Anim = !Anim;
 \end_layout
 
 \begin_layout Plain Layout
+
       if (Anim)
 \end_layout
 
 \begin_layout Plain Layout
+
          glutIdleFunc(Idle);
 \end_layout
 
 \begin_layout Plain Layout
+
       else
 \end_layout
 
 \begin_layout Plain Layout
+
          glutIdleFunc(NULL);
 \end_layout
 
 \begin_layout Plain Layout
+
       break;
 \end_layout
 
 \begin_layout Plain Layout
+
    case 'w':
 \end_layout
 
 \begin_layout Plain Layout
+
       WireFrame = !WireFrame;
 \end_layout
 
 \begin_layout Plain Layout
+
       break;
 \end_layout
 
 \begin_layout Plain Layout
+
    case 'z':
 \end_layout
 
 \begin_layout Plain Layout
+
       zRot += step;
 \end_layout
 
 \begin_layout Plain Layout
+
       break;
 \end_layout
 
 \begin_layout Plain Layout
+
    case 'Z':
 \end_layout
 
 \begin_layout Plain Layout
+
       zRot -= step;
 \end_layout
 
 \begin_layout Plain Layout
+
       break;
 \end_layout
 
 \begin_layout Plain Layout
+
    case 27:
 \end_layout
 
 \begin_layout Plain Layout
+
       CleanUp();
 \end_layout
 
 \begin_layout Plain Layout
+
       exit(0);
 \end_layout
 
 \begin_layout Plain Layout
+
       break;
 \end_layout
 
 \begin_layout Plain Layout
+
    }
 \end_layout
 
 \begin_layout Plain Layout
+
    glutPostRedisplay();
 \end_layout
 
 \begin_layout Plain Layout
+
 }
 \end_layout
 
@@ -4144,18 +4674,22 @@ Key(unsigned char key, int x, int y)
 \end_layout
 
 \begin_layout Plain Layout
+
 static void
 \end_layout
 
 \begin_layout Plain Layout
+
 SpecialKey(int key, int x, int y)
 \end_layout
 
 \begin_layout Plain Layout
+
 {
 \end_layout
 
 \begin_layout Plain Layout
+
    const GLfloat step = 2.0;
 \end_layout
 
@@ -4164,10 +4698,12 @@ SpecialKey(int key, int x, int y)
 \end_layout
 
 \begin_layout Plain Layout
+
    (void) x;
 \end_layout
 
 \begin_layout Plain Layout
+
    (void) y;
 \end_layout
 
@@ -4176,66 +4712,82 @@ SpecialKey(int key, int x, int y)
 \end_layout
 
 \begin_layout Plain Layout
+
    switch(key) {
 \end_layout
 
 \begin_layout Plain Layout
+
    case GLUT_KEY_UP:
 \end_layout
 
 \begin_layout Plain Layout
+
       xRot += step;
 \end_layout
 
 \begin_layout Plain Layout
+
       break;
 \end_layout
 
 \begin_layout Plain Layout
+
    case GLUT_KEY_DOWN:
 \end_layout
 
 \begin_layout Plain Layout
+
       xRot -= step;
 \end_layout
 
 \begin_layout Plain Layout
+
       break;
 \end_layout
 
 \begin_layout Plain Layout
+
    case GLUT_KEY_LEFT:
 \end_layout
 
 \begin_layout Plain Layout
+
       yRot -= step;
 \end_layout
 
 \begin_layout Plain Layout
+
       break;
 \end_layout
 
 \begin_layout Plain Layout
+
    case GLUT_KEY_RIGHT:
 \end_layout
 
 \begin_layout Plain Layout
+
       yRot += step;
 \end_layout
 
 \begin_layout Plain Layout
+
       break;
 \end_layout
 
 \begin_layout Plain Layout
+
    }
 \end_layout
 
 \begin_layout Plain Layout
+
    glutPostRedisplay();
 \end_layout
 
 \begin_layout Plain Layout
+
 }
 \end_layout
 
@@ -4248,22 +4800,27 @@ SpecialKey(int key, int x, int y)
 \end_layout
 
 \begin_layout Plain Layout
+
 static void
 \end_layout
 
 \begin_layout Plain Layout
+
 Init(void)
 \end_layout
 
 \begin_layout Plain Layout
+
 {
 \end_layout
 
 \begin_layout Plain Layout
+
    GLfloat HeightArray[20];
 \end_layout
 
 \begin_layout Plain Layout
+
    GLint u, i;
 \end_layout
 
@@ -4272,10 +4829,12 @@ Init(void)
 \end_layout
 
 \begin_layout Plain Layout
+
    if (!ShadersSupported())
 \end_layout
 
 \begin_layout Plain Layout
+
       exit(1);
 \end_layout
 
@@ -4284,14 +4843,17 @@ Init(void)
 \end_layout
 
 \begin_layout Plain Layout
+
    vertShader = CompileShaderText(GL_VERTEX_SHADER, VertShaderText);
 \end_layout
 
 \begin_layout Plain Layout
+
    fragShader = CompileShaderText(GL_FRAGMENT_SHADER, FragShaderText);
 \end_layout
 
 \begin_layout Plain Layout
+
    program = LinkShaders(vertShader, fragShader);
 \end_layout
 
@@ -4300,6 +4862,7 @@ Init(void)
 \end_layout
 
 \begin_layout Plain Layout
+
    glUseProgram(program);
 \end_layout
 
@@ -4308,22 +4871,27 @@ Init(void)
 \end_layout
 
 \begin_layout Plain Layout
+
    /* Setup the HeightArray[] uniform */
 \end_layout
 
 \begin_layout Plain Layout
+
    for (i = 0; i < 20; i++)
 \end_layout
 
 \begin_layout Plain Layout
+
       HeightArray[i] = i / 20.0;
 \end_layout
 
 \begin_layout Plain Layout
+
    u = glGetUniformLocation(program, "HeightArray");
 \end_layout
 
 \begin_layout Plain Layout
+
    glUniform1fv(u, 20, HeightArray);
 \end_layout
 
@@ -4332,6 +4900,7 @@ Init(void)
 \end_layout
 
 \begin_layout Plain Layout
+
    assert(glGetError() == 0);
 \end_layout
 
@@ -4340,18 +4909,22 @@ Init(void)
 \end_layout
 
 \begin_layout Plain Layout
+
    glClearColor(0.4f, 0.4f, 0.8f, 0.0f);
 \end_layout
 
 \begin_layout Plain Layout
+
    glEnable(GL_DEPTH_TEST);
 \end_layout
 
 \begin_layout Plain Layout
+
    glColor3f(1, 1, 1);
 \end_layout
 
 \begin_layout Plain Layout
+
 }
 \end_layout
 
@@ -4364,128 +4937,159 @@ Init(void)
 \end_layout
 
 \begin_layout Plain Layout
+
 int
 \end_layout
 
 \begin_layout Plain Layout
+
 main(int argc, char *argv[])
 \end_layout
 
 \begin_layout Plain Layout
+
 {
 \end_layout
 
 \begin_layout Plain Layout
+
   srand(time(NULL));
 \end_layout
 
 \begin_layout Plain Layout
+
   float in = 0.0;
 \end_layout
 
 \begin_layout Plain Layout
+
   int control = 0;
 \end_layout
 
 \begin_layout Plain Layout
+
   
 \end_layout
 
 \begin_layout Plain Layout
+
   
 \end_layout
 
 \begin_layout Plain Layout
+
   FILE *f = fopen("results.txt", "r");
 \end_layout
 
 \begin_layout Plain Layout
+
   fscanf(f,"%d",&LENGTH);
 \end_layout
 
 \begin_layout Plain Layout
+
   fscanf(f,"%d",&control);
 \end_layout
 
 \begin_layout Plain Layout
+
   assert(LENGTH==control);
 \end_layout
 
 \begin_layout Plain Layout
+
   float arr[LENGTH*LENGTH];
 \end_layout
 
 \begin_layout Plain Layout
+
   inm = &arr;
 \end_layout
 
 \begin_layout Plain Layout
+
   for(int i=0; i<LENGTH*LENGTH; i++)
 \end_layout
 
 \begin_layout Plain Layout
+
   {
 \end_layout
 
 \begin_layout Plain Layout
+
     fscanf(f,"%f",&in);
 \end_layout
 
 \begin_layout Plain Layout
+
     inm[i] = in;
 \end_layout
 
 \begin_layout Plain Layout
+
     //inm[i] = rand()%GLmaxdiff;
 \end_layout
 
 \begin_layout Plain Layout
+
     if (in < lowest)
 \end_layout
 
 \begin_layout Plain Layout
+
     {
 \end_layout
 
 \begin_layout Plain Layout
+
       lowest = in;
 \end_layout
 
 \begin_layout Plain Layout
+
     } 
 \end_layout
 
 \begin_layout Plain Layout
+
     else if (in > highest)
 \end_layout
 
 \begin_layout Plain Layout
+
     {
 \end_layout
 
 \begin_layout Plain Layout
+
       highest = in;
 \end_layout
 
 \begin_layout Plain Layout
+
     }
 \end_layout
 
 \begin_layout Plain Layout
+
     //printf("%f
 \backslash
 n", in);
 \end_layout
 
 \begin_layout Plain Layout
+
   }
 \end_layout
 
 \begin_layout Plain Layout
+
   fclose(f);
 \end_layout
 
 \begin_layout Plain Layout
+
   
 \end_layout
 
@@ -4498,14 +5102,17 @@ n", in);
 \end_layout
 
 \begin_layout Plain Layout
+
     /**
 \end_layout
 
 \begin_layout Plain Layout
+
     * Start OpenGL stuff
 \end_layout
 
 \begin_layout Plain Layout
+
     */
 \end_layout
 
@@ -4514,62 +5121,77 @@ n", in);
 \end_layout
 
 \begin_layout Plain Layout
+
    glutInit(&argc, argv);
 \end_layout
 
 \begin_layout Plain Layout
+
    glutInitWindowSize(500, 500);
 \end_layout
 
 \begin_layout Plain Layout
+
    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
 \end_layout
 
 \begin_layout Plain Layout
+
    win = glutCreateWindow(argv[0]);
 \end_layout
 
 \begin_layout Plain Layout
+
    glewInit();
 \end_layout
 
 \begin_layout Plain Layout
+
    glutReshapeFunc(Reshape);
 \end_layout
 
 \begin_layout Plain Layout
+
    glutKeyboardFunc(Key);
 \end_layout
 
 \begin_layout Plain Layout
+
    glutSpecialFunc(SpecialKey);
 \end_layout
 
 \begin_layout Plain Layout
+
    glutDisplayFunc(Redisplay);
 \end_layout
 
 \begin_layout Plain Layout
+
    Init();
 \end_layout
 
 \begin_layout Plain Layout
+
    if (Anim)
 \end_layout
 
 \begin_layout Plain Layout
+
       glutIdleFunc(Idle);
 \end_layout
 
 \begin_layout Plain Layout
+
    glutMainLoop();
 \end_layout
 
 \begin_layout Plain Layout
+
    return 0;
 \end_layout
 
 \begin_layout Plain Layout
+
 }
 \end_layout
 
@@ -4596,10 +5218,12 @@ inline false
 status open
 
 \begin_layout Plain Layout
+
 #ifndef GLUT_WRAP_H
 \end_layout
 
 \begin_layout Plain Layout
+
 #define GLUT_WRAP_H
 \end_layout
 
@@ -4608,30 +5232,37 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
+
 #ifdef HAVE_FREEGLUT
 \end_layout
 
 \begin_layout Plain Layout
+
 #  include <GL/freeglut.h>
 \end_layout
 
 \begin_layout Plain Layout
+
 #elif defined __APPLE__
 \end_layout
 
 \begin_layout Plain Layout
+
 #  include <GLUT/glut.h>
 \end_layout
 
 \begin_layout Plain Layout
+
 #else
 \end_layout
 
 \begin_layout Plain Layout
+
 #  include <GL/glut.h>
 \end_layout
 
 \begin_layout Plain Layout
+
 #endif
 \end_layout
 
@@ -4640,14 +5271,17 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
+
 #ifndef GLAPIENTRY
 \end_layout
 
 \begin_layout Plain Layout
+
 #define GLAPIENTRY
 \end_layout
 
 \begin_layout Plain Layout
+
 #endif
 \end_layout
 
@@ -4656,6 +5290,7 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
+
 #endif /* ! GLUT_WRAP_H */
 \end_layout
 
@@ -4678,26 +5313,32 @@ inline false
 status open
 
 \begin_layout Plain Layout
+
 /**
 \end_layout
 
 \begin_layout Plain Layout
+
  * Utilities for OpenGL shading language
 \end_layout
 
 \begin_layout Plain Layout
+
  *
 \end_layout
 
 \begin_layout Plain Layout
+
  * Brian Paul
 \end_layout
 
 \begin_layout Plain Layout
+
  * 9 April 2008
 \end_layout
 
 \begin_layout Plain Layout
+
  */
 \end_layout
 
@@ -4710,30 +5351,37 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
+
 #include <assert.h>
 \end_layout
 
 \begin_layout Plain Layout
+
 #include <stdio.h>
 \end_layout
 
 \begin_layout Plain Layout
+
 #include <stdlib.h>
 \end_layout
 
 \begin_layout Plain Layout
+
 #include <string.h>
 \end_layout
 
 \begin_layout Plain Layout
+
 #include <GL/glew.h>
 \end_layout
 
 \begin_layout Plain Layout
+
 #include "glut_wrap.h"
 \end_layout
 
 \begin_layout Plain Layout
+
 #include "shaderutil.h"
 \end_layout
 
@@ -4742,10 +5390,12 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
+
 /** time to compile previous shader */
 \end_layout
 
 \begin_layout Plain Layout
+
 static GLdouble CompileTime = 0.0;
 \end_layout
 
@@ -4754,10 +5404,12 @@ static GLdouble CompileTime = 0.0;
 \end_layout
 
 \begin_layout Plain Layout
+
 /** time to linke previous program */
 \end_layout
 
 \begin_layout Plain Layout
+
 static GLdouble LinkTime = 0.0;
 \end_layout
 
@@ -4766,86 +5418,107 @@ static GLdouble LinkTime = 0.0;
 \end_layout
 
 \begin_layout Plain Layout
+
 PFNGLCREATESHADERPROC CreateShader = NULL;
 \end_layout
 
 \begin_layout Plain Layout
+
 PFNGLDELETESHADERPROC DeleteShader = NULL;
 \end_layout
 
 \begin_layout Plain Layout
+
 PFNGLSHADERSOURCEPROC ShaderSource = NULL;
 \end_layout
 
 \begin_layout Plain Layout
+
 PFNGLGETSHADERIVPROC GetShaderiv = NULL;
 \end_layout
 
 \begin_layout Plain Layout
+
 PFNGLGETSHADERINFOLOGPROC GetShaderInfoLog = NULL;
 \end_layout
 
 \begin_layout Plain Layout
+
 PFNGLCREATEPROGRAMPROC CreateProgram = NULL;
 \end_layout
 
 \begin_layout Plain Layout
+
 PFNGLDELETEPROGRAMPROC DeleteProgram = NULL;
 \end_layout
 
 \begin_layout Plain Layout
+
 PFNGLATTACHSHADERPROC AttachShader = NULL;
 \end_layout
 
 \begin_layout Plain Layout
+
 PFNGLLINKPROGRAMPROC LinkProgram = NULL;
 \end_layout
 
 \begin_layout Plain Layout
+
 PFNGLUSEPROGRAMPROC UseProgram = NULL;
 \end_layout
 
 \begin_layout Plain Layout
+
 PFNGLGETPROGRAMIVPROC GetProgramiv = NULL;
 \end_layout
 
 \begin_layout Plain Layout
+
 PFNGLGETPROGRAMINFOLOGPROC GetProgramInfoLog = NULL;
 \end_layout
 
 \begin_layout Plain Layout
+
 PFNGLVALIDATEPROGRAMARBPROC ValidateProgramARB = NULL;
 \end_layout
 
 \begin_layout Plain Layout
+
 PFNGLUNIFORM1IPROC Uniform1i = NULL;
 \end_layout
 
 \begin_layout Plain Layout
+
 PFNGLUNIFORM1FVPROC Uniform1fv = NULL;
 \end_layout
 
 \begin_layout Plain Layout
+
 PFNGLUNIFORM2FVPROC Uniform2fv = NULL;
 \end_layout
 
 \begin_layout Plain Layout
+
 PFNGLUNIFORM3FVPROC Uniform3fv = NULL;
 \end_layout
 
 \begin_layout Plain Layout
+
 PFNGLUNIFORM4FVPROC Uniform4fv = NULL;
 \end_layout
 
 \begin_layout Plain Layout
+
 PFNGLUNIFORMMATRIX4FVPROC UniformMatrix4fv = NULL;
 \end_layout
 
 \begin_layout Plain Layout
+
 PFNGLGETACTIVEATTRIBPROC GetActiveAttrib = NULL;
 \end_layout
 
 \begin_layout Plain Layout
+
 PFNGLGETATTRIBLOCATIONPROC GetAttribLocation = NULL;
 \end_layout
 
@@ -4854,22 +5527,27 @@ PFNGLGETATTRIBLOCATIONPROC GetAttribLocation = NULL;
 \end_layout
 
 \begin_layout Plain Layout
+
 static void GLAPIENTRY
 \end_layout
 
 \begin_layout Plain Layout
+
 fake_ValidateProgram(GLuint prog)
 \end_layout
 
 \begin_layout Plain Layout
+
 {
 \end_layout
 
 \begin_layout Plain Layout
+
    (void) prog;
 \end_layout
 
 \begin_layout Plain Layout
+
 }
 \end_layout
 
@@ -4878,126 +5556,157 @@ fake_ValidateProgram(GLuint prog)
 \end_layout
 
 \begin_layout Plain Layout
+
 GLboolean
 \end_layout
 
 \begin_layout Plain Layout
+
 ShadersSupported(void)
 \end_layout
 
 \begin_layout Plain Layout
+
 {
 \end_layout
 
 \begin_layout Plain Layout
+
    if (GLEW_VERSION_2_0) {
 \end_layout
 
 \begin_layout Plain Layout
+
       CreateShader = glCreateShader;
 \end_layout
 
 \begin_layout Plain Layout
+
       DeleteShader = glDeleteShader;
 \end_layout
 
 \begin_layout Plain Layout
+
       ShaderSource = glShaderSource;
 \end_layout
 
 \begin_layout Plain Layout
+
       GetShaderiv = glGetShaderiv;
 \end_layout
 
 \begin_layout Plain Layout
+
       GetShaderInfoLog = glGetShaderInfoLog;
 \end_layout
 
 \begin_layout Plain Layout
+
       CreateProgram = glCreateProgram;
 \end_layout
 
 \begin_layout Plain Layout
+
       DeleteProgram = glDeleteProgram;
 \end_layout
 
 \begin_layout Plain Layout
+
       AttachShader = glAttachShader;
 \end_layout
 
 \begin_layout Plain Layout
+
       LinkProgram = glLinkProgram;
 \end_layout
 
 \begin_layout Plain Layout
+
       UseProgram = glUseProgram;
 \end_layout
 
 \begin_layout Plain Layout
+
       GetProgramiv = glGetProgramiv;
 \end_layout
 
 \begin_layout Plain Layout
+
       GetProgramInfoLog = glGetProgramInfoLog;
 \end_layout
 
 \begin_layout Plain Layout
+
       ValidateProgramARB = (GLEW_ARB_shader_objects)
 \end_layout
 
 \begin_layout Plain Layout
+
 	 ? glValidateProgramARB : fake_ValidateProgram;
 \end_layout
 
 \begin_layout Plain Layout
+
       Uniform1i = glUniform1i;
 \end_layout
 
 \begin_layout Plain Layout
+
       Uniform1fv = glUniform1fv;
 \end_layout
 
 \begin_layout Plain Layout
+
       Uniform2fv = glUniform2fv;
 \end_layout
 
 \begin_layout Plain Layout
+
       Uniform3fv = glUniform3fv;
 \end_layout
 
 \begin_layout Plain Layout
+
       Uniform4fv = glUniform4fv;
 \end_layout
 
 \begin_layout Plain Layout
+
       UniformMatrix4fv = glUniformMatrix4fv;
 \end_layout
 
 \begin_layout Plain Layout
+
       GetActiveAttrib = glGetActiveAttrib;
 \end_layout
 
 \begin_layout Plain Layout
+
       GetAttribLocation = glGetAttribLocation;
 \end_layout
 
 \begin_layout Plain Layout
+
       return GL_TRUE;
 \end_layout
 
 \begin_layout Plain Layout
+
    }
 \end_layout
 
 \begin_layout Plain Layout
+
    else if (GLEW_ARB_vertex_shader && GLEW_ARB_fragment_shader
 \end_layout
 
 \begin_layout Plain Layout
+
 	    && GLEW_ARB_shader_objects) {
 \end_layout
 
 \begin_layout Plain Layout
+
       fprintf(stderr, "Warning: Trying ARB GLSL instead of OpenGL 2.x.
   This may not work.
 \backslash
@@ -5005,108 +5714,134 @@ n");
 \end_layout
 
 \begin_layout Plain Layout
+
       CreateShader = glCreateShaderObjectARB;
 \end_layout
 
 \begin_layout Plain Layout
+
       DeleteShader = glDeleteObjectARB;
 \end_layout
 
 \begin_layout Plain Layout
+
       ShaderSource = glShaderSourceARB;
 \end_layout
 
 \begin_layout Plain Layout
+
       GetShaderiv = glGetObjectParameterivARB;
 \end_layout
 
 \begin_layout Plain Layout
+
       GetShaderInfoLog = glGetInfoLogARB;
 \end_layout
 
 \begin_layout Plain Layout
+
       CreateProgram = glCreateProgramObjectARB;
 \end_layout
 
 \begin_layout Plain Layout
+
       DeleteProgram = glDeleteObjectARB;
 \end_layout
 
 \begin_layout Plain Layout
+
       AttachShader = glAttachObjectARB;
 \end_layout
 
 \begin_layout Plain Layout
+
       LinkProgram = glLinkProgramARB;
 \end_layout
 
 \begin_layout Plain Layout
+
       UseProgram = glUseProgramObjectARB;
 \end_layout
 
 \begin_layout Plain Layout
+
       GetProgramiv = glGetObjectParameterivARB;
 \end_layout
 
 \begin_layout Plain Layout
+
       GetProgramInfoLog = glGetInfoLogARB;
 \end_layout
 
 \begin_layout Plain Layout
+
       ValidateProgramARB = glValidateProgramARB;
 \end_layout
 
 \begin_layout Plain Layout
+
       Uniform1i = glUniform1iARB;
 \end_layout
 
 \begin_layout Plain Layout
+
       Uniform1fv = glUniform1fvARB;
 \end_layout
 
 \begin_layout Plain Layout
+
       Uniform2fv = glUniform2fvARB;
 \end_layout
 
 \begin_layout Plain Layout
+
       Uniform3fv = glUniform3fvARB;
 \end_layout
 
 \begin_layout Plain Layout
+
       Uniform4fv = glUniform4fvARB;
 \end_layout
 
 \begin_layout Plain Layout
+
       UniformMatrix4fv = glUniformMatrix4fvARB;
 \end_layout
 
 \begin_layout Plain Layout
+
       GetActiveAttrib = glGetActiveAttribARB;
 \end_layout
 
 \begin_layout Plain Layout
+
       GetAttribLocation = glGetAttribLocationARB;
 \end_layout
 
 \begin_layout Plain Layout
+
       return GL_TRUE;
 \end_layout
 
 \begin_layout Plain Layout
+
    }
 \end_layout
 
 \begin_layout Plain Layout
+
    fprintf(stderr, "Sorry, GLSL not supported with this OpenGL.
 \backslash
 n");
 \end_layout
 
 \begin_layout Plain Layout
+
    return GL_FALSE;
 \end_layout
 
 \begin_layout Plain Layout
+
 }
 \end_layout
 
@@ -5119,26 +5854,32 @@ n");
 \end_layout
 
 \begin_layout Plain Layout
+
 GLuint
 \end_layout
 
 \begin_layout Plain Layout
+
 CompileShaderText(GLenum shaderType, const char *text)
 \end_layout
 
 \begin_layout Plain Layout
+
 {
 \end_layout
 
 \begin_layout Plain Layout
+
    GLuint shader;
 \end_layout
 
 \begin_layout Plain Layout
+
    GLint stat;
 \end_layout
 
 \begin_layout Plain Layout
+
    GLdouble t0, t1;
 \end_layout
 
@@ -5147,10 +5888,12 @@ CompileShaderText(GLenum shaderType, const char *text)
 \end_layout
 
 \begin_layout Plain Layout
+
    shader = CreateShader(shaderType);
 \end_layout
 
 \begin_layout Plain Layout
+
    ShaderSource(shader, 1, (const GLchar **) &text, NULL);
 \end_layout
 
@@ -5159,14 +5902,17 @@ CompileShaderText(GLenum shaderType, const char *text)
 \end_layout
 
 \begin_layout Plain Layout
+
    t0 = glutGet(GLUT_ELAPSED_TIME) * 0.001;
 \end_layout
 
 \begin_layout Plain Layout
+
    glCompileShader(shader);
 \end_layout
 
 \begin_layout Plain Layout
+
    t1 = glutGet(GLUT_ELAPSED_TIME) * 0.001;
 \end_layout
 
@@ -5175,6 +5921,7 @@ CompileShaderText(GLenum shaderType, const char *text)
 \end_layout
 
 \begin_layout Plain Layout
+
    CompileTime = t1 - t0;
 \end_layout
 
@@ -5183,58 +5930,71 @@ CompileShaderText(GLenum shaderType, const char *text)
 \end_layout
 
 \begin_layout Plain Layout
+
    GetShaderiv(shader, GL_COMPILE_STATUS, &stat);
 \end_layout
 
 \begin_layout Plain Layout
+
    if (!stat) {
 \end_layout
 
 \begin_layout Plain Layout
+
       GLchar log[1000];
 \end_layout
 
 \begin_layout Plain Layout
+
       GLsizei len;
 \end_layout
 
 \begin_layout Plain Layout
+
       GetShaderInfoLog(shader, 1000, &len, log);
 \end_layout
 
 \begin_layout Plain Layout
+
       fprintf(stderr, "Error: problem compiling shader: %s
 \backslash
 n", log);
 \end_layout
 
 \begin_layout Plain Layout
+
       exit(1);
 \end_layout
 
 \begin_layout Plain Layout
+
    }
 \end_layout
 
 \begin_layout Plain Layout
+
    else {
 \end_layout
 
 \begin_layout Plain Layout
+
       /*printf("Shader compiled OK
 \backslash
 n");*/
 \end_layout
 
 \begin_layout Plain Layout
+
    }
 \end_layout
 
 \begin_layout Plain Layout
+
    return shader;
 \end_layout
 
 \begin_layout Plain Layout
+
 }
 \end_layout
 
@@ -5247,46 +6007,57 @@ n");*/
 \end_layout
 
 \begin_layout Plain Layout
+
 /**
 \end_layout
 
 \begin_layout Plain Layout
+
  * Read a shader from a file.
 \end_layout
 
 \begin_layout Plain Layout
+
  */
 \end_layout
 
 \begin_layout Plain Layout
+
 GLuint
 \end_layout
 
 \begin_layout Plain Layout
+
 CompileShaderFile(GLenum shaderType, const char *filename)
 \end_layout
 
 \begin_layout Plain Layout
+
 {
 \end_layout
 
 \begin_layout Plain Layout
+
    const int max = 100*1000;
 \end_layout
 
 \begin_layout Plain Layout
+
    int n;
 \end_layout
 
 \begin_layout Plain Layout
+
    char *buffer = (char*) malloc(max);
 \end_layout
 
 \begin_layout Plain Layout
+
    GLuint shader;
 \end_layout
 
 \begin_layout Plain Layout
+
    FILE *f;
 \end_layout
 
@@ -5295,28 +6066,34 @@ CompileShaderFile(GLenum shaderType, const char *filename)
 \end_layout
 
 \begin_layout Plain Layout
+
    f = fopen(filename, "r");
 \end_layout
 
 \begin_layout Plain Layout
+
    if (!f) {
 \end_layout
 
 \begin_layout Plain Layout
+
       fprintf(stderr, "Unable to open shader file %s
 \backslash
 n", filename);
 \end_layout
 
 \begin_layout Plain Layout
+
       free(buffer);
 \end_layout
 
 \begin_layout Plain Layout
+
       return 0;
 \end_layout
 
 \begin_layout Plain Layout
+
    }
 \end_layout
 
@@ -5325,48 +6102,59 @@ n", filename);
 \end_layout
 
 \begin_layout Plain Layout
+
    n = fread(buffer, 1, max, f);
 \end_layout
 
 \begin_layout Plain Layout
+
    /*printf("read %d bytes from shader file %s
 \backslash
 n", n, filename);*/
 \end_layout
 
 \begin_layout Plain Layout
+
    if (n > 0) {
 \end_layout
 
 \begin_layout Plain Layout
+
       buffer[n] = 0;
 \end_layout
 
 \begin_layout Plain Layout
+
       shader = CompileShaderText(shaderType, buffer);
 \end_layout
 
 \begin_layout Plain Layout
+
    }
 \end_layout
 
 \begin_layout Plain Layout
+
    else {
 \end_layout
 
 \begin_layout Plain Layout
+
       fclose(f);
 \end_layout
 
 \begin_layout Plain Layout
+
       free(buffer);
 \end_layout
 
 \begin_layout Plain Layout
+
       return 0;
 \end_layout
 
 \begin_layout Plain Layout
+
    }
 \end_layout
 
@@ -5375,10 +6163,12 @@ n", n, filename);*/
 \end_layout
 
 \begin_layout Plain Layout
+
    fclose(f);
 \end_layout
 
 \begin_layout Plain Layout
+
    free(buffer);
 \end_layout
 
@@ -5387,10 +6177,12 @@ n", n, filename);*/
 \end_layout
 
 \begin_layout Plain Layout
+
    return shader;
 \end_layout
 
 \begin_layout Plain Layout
+
 }
 \end_layout
 
@@ -5403,22 +6195,27 @@ n", n, filename);*/
 \end_layout
 
 \begin_layout Plain Layout
+
 GLuint
 \end_layout
 
 \begin_layout Plain Layout
+
 LinkShaders(GLuint vertShader, GLuint fragShader)
 \end_layout
 
 \begin_layout Plain Layout
+
 {
 \end_layout
 
 \begin_layout Plain Layout
+
    return LinkShaders3(vertShader, 0, fragShader);
 \end_layout
 
 \begin_layout Plain Layout
+
 }
 \end_layout
 
@@ -5431,22 +6228,27 @@ LinkShaders(GLuint vertShader, GLuint fragShader)
 \end_layout
 
 \begin_layout Plain Layout
+
 GLuint
 \end_layout
 
 \begin_layout Plain Layout
+
 LinkShaders3(GLuint vertShader, GLuint geomShader, GLuint fragShader)
 \end_layout
 
 \begin_layout Plain Layout
+
 {
 \end_layout
 
 \begin_layout Plain Layout
+
    GLuint program = CreateProgram();
 \end_layout
 
 \begin_layout Plain Layout
+
    GLdouble t0, t1;
 \end_layout
 
@@ -5455,6 +6257,7 @@ LinkShaders3(GLuint vertShader, GLuint geomShader, GLuint fragShader)
 \end_layout
 
 \begin_layout Plain Layout
+
    assert(vertShader || fragShader);
 \end_layout
 
@@ -5463,26 +6266,32 @@ LinkShaders3(GLuint vertShader, GLuint geomShader, GLuint fragShader)
 \end_layout
 
 \begin_layout Plain Layout
+
    if (vertShader)
 \end_layout
 
 \begin_layout Plain Layout
+
       AttachShader(program, vertShader);
 \end_layout
 
 \begin_layout Plain Layout
+
    if (geomShader)
 \end_layout
 
 \begin_layout Plain Layout
+
       AttachShader(program, geomShader);
 \end_layout
 
 \begin_layout Plain Layout
+
    if (fragShader)
 \end_layout
 
 \begin_layout Plain Layout
+
       AttachShader(program, fragShader);
 \end_layout
 
@@ -5491,14 +6300,17 @@ LinkShaders3(GLuint vertShader, GLuint geomShader, GLuint fragShader)
 \end_layout
 
 \begin_layout Plain Layout
+
    t0 = glutGet(GLUT_ELAPSED_TIME) * 0.001;
 \end_layout
 
 \begin_layout Plain Layout
+
    LinkProgram(program);
 \end_layout
 
 \begin_layout Plain Layout
+
    t1 = glutGet(GLUT_ELAPSED_TIME) * 0.001;
 \end_layout
 
@@ -5507,6 +6319,7 @@ LinkShaders3(GLuint vertShader, GLuint geomShader, GLuint fragShader)
 \end_layout
 
 \begin_layout Plain Layout
+
    LinkTime = t1 - t0;
 \end_layout
 
@@ -5515,38 +6328,47 @@ LinkShaders3(GLuint vertShader, GLuint geomShader, GLuint fragShader)
 \end_layout
 
 \begin_layout Plain Layout
+
    /* check link */
 \end_layout
 
 \begin_layout Plain Layout
+
    {
 \end_layout
 
 \begin_layout Plain Layout
+
       GLint stat;
 \end_layout
 
 \begin_layout Plain Layout
+
       GetProgramiv(program, GL_LINK_STATUS, &stat);
 \end_layout
 
 \begin_layout Plain Layout
+
       if (!stat) {
 \end_layout
 
 \begin_layout Plain Layout
+
          GLchar log[1000];
 \end_layout
 
 \begin_layout Plain Layout
+
          GLsizei len;
 \end_layout
 
 \begin_layout Plain Layout
+
          GetProgramInfoLog(program, 1000, &len, log);
 \end_layout
 
 \begin_layout Plain Layout
+
          fprintf(stderr, "Shader link error:
 \backslash
 n%s
@@ -5555,14 +6377,17 @@ n", log);
 \end_layout
 
 \begin_layout Plain Layout
+
          return 0;
 \end_layout
 
 \begin_layout Plain Layout
+
       }
 \end_layout
 
 \begin_layout Plain Layout
+
    }
 \end_layout
 
@@ -5571,10 +6396,12 @@ n", log);
 \end_layout
 
 \begin_layout Plain Layout
+
    return program;
 \end_layout
 
 \begin_layout Plain Layout
+
 }
 \end_layout
 
@@ -5587,28 +6414,34 @@ n", log);
 \end_layout
 
 \begin_layout Plain Layout
+
 GLuint
 \end_layout
 
 \begin_layout Plain Layout
+
 LinkShaders3WithGeometryInfo(GLuint vertShader, GLuint geomShader, GLuint
  fragShader,
 \end_layout
 
 \begin_layout Plain Layout
+
                              GLint verticesOut, GLenum inputType, GLenum
  outputType)
 \end_layout
 
 \begin_layout Plain Layout
+
 {
 \end_layout
 
 \begin_layout Plain Layout
+
   GLuint program = CreateProgram();
 \end_layout
 
 \begin_layout Plain Layout
+
   GLdouble t0, t1;
 \end_layout
 
@@ -5617,6 +6450,7 @@ LinkShaders3WithGeometryInfo(GLuint vertShader, GLuint geomShader, GLuint
 \end_layout
 
 \begin_layout Plain Layout
+
   assert(vertShader || fragShader);
 \end_layout
 
@@ -5625,42 +6459,52 @@ LinkShaders3WithGeometryInfo(GLuint vertShader, GLuint geomShader, GLuint
 \end_layout
 
 \begin_layout Plain Layout
+
   if (vertShader)
 \end_layout
 
 \begin_layout Plain Layout
+
     AttachShader(program, vertShader);
 \end_layout
 
 \begin_layout Plain Layout
+
   if (geomShader) {
 \end_layout
 
 \begin_layout Plain Layout
+
     AttachShader(program, geomShader);
 \end_layout
 
 \begin_layout Plain Layout
+
     glProgramParameteriARB(program, GL_GEOMETRY_VERTICES_OUT_ARB, verticesOut);
 \end_layout
 
 \begin_layout Plain Layout
+
     glProgramParameteriARB(program, GL_GEOMETRY_INPUT_TYPE_ARB, inputType);
 \end_layout
 
 \begin_layout Plain Layout
+
     glProgramParameteriARB(program, GL_GEOMETRY_OUTPUT_TYPE_ARB, outputType);
 \end_layout
 
 \begin_layout Plain Layout
+
   }
 \end_layout
 
 \begin_layout Plain Layout
+
   if (fragShader)
 \end_layout
 
 \begin_layout Plain Layout
+
     AttachShader(program, fragShader);
 \end_layout
 
@@ -5669,14 +6513,17 @@ LinkShaders3WithGeometryInfo(GLuint vertShader, GLuint geomShader, GLuint
 \end_layout
 
 \begin_layout Plain Layout
+
   t0 = glutGet(GLUT_ELAPSED_TIME) * 0.001;
 \end_layout
 
 \begin_layout Plain Layout
+
   LinkProgram(program);
 \end_layout
 
 \begin_layout Plain Layout
+
   t1 = glutGet(GLUT_ELAPSED_TIME) * 0.001;
 \end_layout
 
@@ -5685,6 +6532,7 @@ LinkShaders3WithGeometryInfo(GLuint vertShader, GLuint geomShader, GLuint
 \end_layout
 
 \begin_layout Plain Layout
+
   LinkTime = t1 - t0;
 \end_layout
 
@@ -5693,38 +6541,47 @@ LinkShaders3WithGeometryInfo(GLuint vertShader, GLuint geomShader, GLuint
 \end_layout
 
 \begin_layout Plain Layout
+
   /* check link */
 \end_layout
 
 \begin_layout Plain Layout
+
   {
 \end_layout
 
 \begin_layout Plain Layout
+
     GLint stat;
 \end_layout
 
 \begin_layout Plain Layout
+
     GetProgramiv(program, GL_LINK_STATUS, &stat);
 \end_layout
 
 \begin_layout Plain Layout
+
     if (!stat) {
 \end_layout
 
 \begin_layout Plain Layout
+
       GLchar log[1000];
 \end_layout
 
 \begin_layout Plain Layout
+
       GLsizei len;
 \end_layout
 
 \begin_layout Plain Layout
+
       GetProgramInfoLog(program, 1000, &len, log);
 \end_layout
 
 \begin_layout Plain Layout
+
       fprintf(stderr, "Shader link error:
 \backslash
 n%s
@@ -5733,14 +6590,17 @@ n", log);
 \end_layout
 
 \begin_layout Plain Layout
+
       return 0;
 \end_layout
 
 \begin_layout Plain Layout
+
     }
 \end_layout
 
 \begin_layout Plain Layout
+
   }
 \end_layout
 
@@ -5749,10 +6609,12 @@ n", log);
 \end_layout
 
 \begin_layout Plain Layout
+
   return program;
 \end_layout
 
 \begin_layout Plain Layout
+
 }
 \end_layout
 
@@ -5765,26 +6627,32 @@ n", log);
 \end_layout
 
 \begin_layout Plain Layout
+
 GLboolean
 \end_layout
 
 \begin_layout Plain Layout
+
 ValidateShaderProgram(GLuint program)
 \end_layout
 
 \begin_layout Plain Layout
+
 {
 \end_layout
 
 \begin_layout Plain Layout
+
    GLint stat;
 \end_layout
 
 \begin_layout Plain Layout
+
    ValidateProgramARB(program);
 \end_layout
 
 \begin_layout Plain Layout
+
    GetProgramiv(program, GL_VALIDATE_STATUS, &stat);
 \end_layout
 
@@ -5793,22 +6661,27 @@ ValidateShaderProgram(GLuint program)
 \end_layout
 
 \begin_layout Plain Layout
+
    if (!stat) {
 \end_layout
 
 \begin_layout Plain Layout
+
       GLchar log[1000];
 \end_layout
 
 \begin_layout Plain Layout
+
       GLsizei len;
 \end_layout
 
 \begin_layout Plain Layout
+
       GetProgramInfoLog(program, 1000, &len, log);
 \end_layout
 
 \begin_layout Plain Layout
+
       fprintf(stderr, "Program validation error:
 \backslash
 n%s
@@ -5817,10 +6690,12 @@ n", log);
 \end_layout
 
 \begin_layout Plain Layout
+
       return 0;
 \end_layout
 
 \begin_layout Plain Layout
+
    }
 \end_layout
 
@@ -5829,10 +6704,12 @@ n", log);
 \end_layout
 
 \begin_layout Plain Layout
+
    return (GLboolean) stat;
 \end_layout
 
 \begin_layout Plain Layout
+
 }
 \end_layout
 
@@ -5845,22 +6722,27 @@ n", log);
 \end_layout
 
 \begin_layout Plain Layout
+
 GLdouble
 \end_layout
 
 \begin_layout Plain Layout
+
 GetShaderCompileTime(void)
 \end_layout
 
 \begin_layout Plain Layout
+
 {
 \end_layout
 
 \begin_layout Plain Layout
+
    return CompileTime;
 \end_layout
 
 \begin_layout Plain Layout
+
 }
 \end_layout
 
@@ -5873,22 +6755,27 @@ GetShaderCompileTime(void)
 \end_layout
 
 \begin_layout Plain Layout
+
 GLdouble
 \end_layout
 
 \begin_layout Plain Layout
+
 GetShaderLinkTime(void)
 \end_layout
 
 \begin_layout Plain Layout
+
 {
 \end_layout
 
 \begin_layout Plain Layout
+
    return LinkTime;
 \end_layout
 
 \begin_layout Plain Layout
+
 }
 \end_layout
 
@@ -5901,18 +6788,22 @@ GetShaderLinkTime(void)
 \end_layout
 
 \begin_layout Plain Layout
+
 void
 \end_layout
 
 \begin_layout Plain Layout
+
 SetUniformValues(GLuint program, struct uniform_info uniforms[])
 \end_layout
 
 \begin_layout Plain Layout
+
 {
 \end_layout
 
 \begin_layout Plain Layout
+
    GLuint i;
 \end_layout
 
@@ -5921,14 +6812,17 @@ SetUniformValues(GLuint program, struct uniform_info uniforms[])
 \end_layout
 
 \begin_layout Plain Layout
+
    for (i = 0; uniforms[i].name; i++) {
 \end_layout
 
 \begin_layout Plain Layout
+
       uniforms[i].location
 \end_layout
 
 \begin_layout Plain Layout
+
          = glGetUniformLocation(program, uniforms[i].name);
 \end_layout
 
@@ -5937,184 +6831,229 @@ SetUniformValues(GLuint program, struct uniform_info uniforms[])
 \end_layout
 
 \begin_layout Plain Layout
+
       switch (uniforms[i].type) {
 \end_layout
 
 \begin_layout Plain Layout
+
       case GL_INT:
 \end_layout
 
 \begin_layout Plain Layout
+
       case GL_SAMPLER_1D:
 \end_layout
 
 \begin_layout Plain Layout
+
       case GL_SAMPLER_2D:
 \end_layout
 
 \begin_layout Plain Layout
+
       case GL_SAMPLER_3D:
 \end_layout
 
 \begin_layout Plain Layout
+
       case GL_SAMPLER_CUBE:
 \end_layout
 
 \begin_layout Plain Layout
+
       case GL_SAMPLER_2D_RECT_ARB:
 \end_layout
 
 \begin_layout Plain Layout
+
       case GL_SAMPLER_1D_SHADOW:
 \end_layout
 
 \begin_layout Plain Layout
+
       case GL_SAMPLER_2D_SHADOW:
 \end_layout
 
 \begin_layout Plain Layout
+
       case GL_SAMPLER_1D_ARRAY:
 \end_layout
 
 \begin_layout Plain Layout
+
       case GL_SAMPLER_2D_ARRAY:
 \end_layout
 
 \begin_layout Plain Layout
+
       case GL_SAMPLER_1D_ARRAY_SHADOW:
 \end_layout
 
 \begin_layout Plain Layout
+
       case GL_SAMPLER_2D_ARRAY_SHADOW:
 \end_layout
 
 \begin_layout Plain Layout
+
          assert(uniforms[i].value[0] >= 0.0F);
 \end_layout
 
 \begin_layout Plain Layout
+
          Uniform1i(uniforms[i].location,
 \end_layout
 
 \begin_layout Plain Layout
+
                      (GLint) uniforms[i].value[0]);
 \end_layout
 
 \begin_layout Plain Layout
+
          break;
 \end_layout
 
 \begin_layout Plain Layout
+
       case GL_FLOAT:
 \end_layout
 
 \begin_layout Plain Layout
+
          Uniform1fv(uniforms[i].location, 1, uniforms[i].value);
 \end_layout
 
 \begin_layout Plain Layout
+
          break;
 \end_layout
 
 \begin_layout Plain Layout
+
       case GL_FLOAT_VEC2:
 \end_layout
 
 \begin_layout Plain Layout
+
          Uniform2fv(uniforms[i].location, 1, uniforms[i].value);
 \end_layout
 
 \begin_layout Plain Layout
+
          break;
 \end_layout
 
 \begin_layout Plain Layout
+
       case GL_FLOAT_VEC3:
 \end_layout
 
 \begin_layout Plain Layout
+
          Uniform3fv(uniforms[i].location, 1, uniforms[i].value);
 \end_layout
 
 \begin_layout Plain Layout
+
          break;
 \end_layout
 
 \begin_layout Plain Layout
+
       case GL_FLOAT_VEC4:
 \end_layout
 
 \begin_layout Plain Layout
+
          Uniform4fv(uniforms[i].location, 1, uniforms[i].value);
 \end_layout
 
 \begin_layout Plain Layout
+
          break;
 \end_layout
 
 \begin_layout Plain Layout
+
       case GL_FLOAT_MAT4:
 \end_layout
 
 \begin_layout Plain Layout
+
          UniformMatrix4fv(uniforms[i].location, 1, GL_FALSE,
 \end_layout
 
 \begin_layout Plain Layout
+
                           uniforms[i].value);
 \end_layout
 
 \begin_layout Plain Layout
+
          break;
 \end_layout
 
 \begin_layout Plain Layout
+
       default:
 \end_layout
 
 \begin_layout Plain Layout
+
          if (strncmp(uniforms[i].name, "gl_", 3) == 0) {
 \end_layout
 
 \begin_layout Plain Layout
+
             /* built-in uniform: ignore */
 \end_layout
 
 \begin_layout Plain Layout
+
          }
 \end_layout
 
 \begin_layout Plain Layout
+
          else {
 \end_layout
 
 \begin_layout Plain Layout
+
             fprintf(stderr,
 \end_layout
 
 \begin_layout Plain Layout
+
                     "Unexpected uniform data type in SetUniformValues
 \backslash
 n");
 \end_layout
 
 \begin_layout Plain Layout
+
             abort();
 \end_layout
 
 \begin_layout Plain Layout
+
          }
 \end_layout
 
 \begin_layout Plain Layout
+
       }
 \end_layout
 
 \begin_layout Plain Layout
+
    }
 \end_layout
 
 \begin_layout Plain Layout
+
 }
 \end_layout
 
@@ -6127,22 +7066,27 @@ n");
 \end_layout
 
 \begin_layout Plain Layout
+
 /** Get list of uniforms used in the program */
 \end_layout
 
 \begin_layout Plain Layout
+
 GLuint
 \end_layout
 
 \begin_layout Plain Layout
+
 GetUniforms(GLuint program, struct uniform_info uniforms[])
 \end_layout
 
 \begin_layout Plain Layout
+
 {
 \end_layout
 
 \begin_layout Plain Layout
+
    GLint n, max, i;
 \end_layout
 
@@ -6151,10 +7095,12 @@ GetUniforms(GLuint program, struct uniform_info uniforms[])
 \end_layout
 
 \begin_layout Plain Layout
+
    GetProgramiv(program, GL_ACTIVE_UNIFORMS, &n);
 \end_layout
 
 \begin_layout Plain Layout
+
    GetProgramiv(program, GL_ACTIVE_UNIFORM_MAX_LENGTH, &max);
 \end_layout
 
@@ -6163,18 +7109,22 @@ GetUniforms(GLuint program, struct uniform_info uniforms[])
 \end_layout
 
 \begin_layout Plain Layout
+
    for (i = 0; i < n; i++) {
 \end_layout
 
 \begin_layout Plain Layout
+
       GLint size, len;
 \end_layout
 
 \begin_layout Plain Layout
+
       GLenum type;
 \end_layout
 
 \begin_layout Plain Layout
+
       char name[100];
 \end_layout
 
@@ -6183,6 +7133,7 @@ GetUniforms(GLuint program, struct uniform_info uniforms[])
 \end_layout
 
 \begin_layout Plain Layout
+
       glGetActiveUniform(program, i, 100, &len, &size, &type, name);
 \end_layout
 
@@ -6191,22 +7142,27 @@ GetUniforms(GLuint program, struct uniform_info uniforms[])
 \end_layout
 
 \begin_layout Plain Layout
+
       uniforms[i].name = strdup(name);
 \end_layout
 
 \begin_layout Plain Layout
+
       uniforms[i].size = size;
 \end_layout
 
 \begin_layout Plain Layout
+
       uniforms[i].type = type;
 \end_layout
 
 \begin_layout Plain Layout
+
       uniforms[i].location = glGetUniformLocation(program, name);
 \end_layout
 
 \begin_layout Plain Layout
+
    }
 \end_layout
 
@@ -6215,6 +7171,7 @@ GetUniforms(GLuint program, struct uniform_info uniforms[])
 \end_layout
 
 \begin_layout Plain Layout
+
    uniforms[i].name = NULL; /* end of list */
 \end_layout
 
@@ -6223,10 +7180,12 @@ GetUniforms(GLuint program, struct uniform_info uniforms[])
 \end_layout
 
 \begin_layout Plain Layout
+
    return n;
 \end_layout
 
 \begin_layout Plain Layout
+
 }
 \end_layout
 
@@ -6239,18 +7198,22 @@ GetUniforms(GLuint program, struct uniform_info uniforms[])
 \end_layout
 
 \begin_layout Plain Layout
+
 void
 \end_layout
 
 \begin_layout Plain Layout
+
 PrintUniforms(const struct uniform_info uniforms[])
 \end_layout
 
 \begin_layout Plain Layout
+
 {
 \end_layout
 
 \begin_layout Plain Layout
+
    GLint i;
 \end_layout
 
@@ -6259,6 +7222,7 @@ PrintUniforms(const struct uniform_info uniforms[])
 \end_layout
 
 \begin_layout Plain Layout
+
    printf("Uniforms:
 \backslash
 n");
@@ -6269,56 +7233,69 @@ n");
 \end_layout
 
 \begin_layout Plain Layout
+
    for (i = 0; uniforms[i].name; i++) {
 \end_layout
 
 \begin_layout Plain Layout
+
       printf("  %d: %s size=%d type=0x%x loc=%d value=%g, %g, %g, %g
 \backslash
 n",
 \end_layout
 
 \begin_layout Plain Layout
+
              i,
 \end_layout
 
 \begin_layout Plain Layout
+
              uniforms[i].name,
 \end_layout
 
 \begin_layout Plain Layout
+
              uniforms[i].size,
 \end_layout
 
 \begin_layout Plain Layout
+
              uniforms[i].type,
 \end_layout
 
 \begin_layout Plain Layout
+
              uniforms[i].location,
 \end_layout
 
 \begin_layout Plain Layout
+
              uniforms[i].value[0],
 \end_layout
 
 \begin_layout Plain Layout
+
              uniforms[i].value[1],
 \end_layout
 
 \begin_layout Plain Layout
+
              uniforms[i].value[2],
 \end_layout
 
 \begin_layout Plain Layout
+
              uniforms[i].value[3]);
 \end_layout
 
 \begin_layout Plain Layout
+
    }
 \end_layout
 
 \begin_layout Plain Layout
+
 }
 \end_layout
 
@@ -6331,22 +7308,27 @@ n",
 \end_layout
 
 \begin_layout Plain Layout
+
 /** Get list of attribs used in the program */
 \end_layout
 
 \begin_layout Plain Layout
+
 GLuint
 \end_layout
 
 \begin_layout Plain Layout
+
 GetAttribs(GLuint program, struct attrib_info attribs[])
 \end_layout
 
 \begin_layout Plain Layout
+
 {
 \end_layout
 
 \begin_layout Plain Layout
+
    GLint n, max, i;
 \end_layout
 
@@ -6355,10 +7337,12 @@ GetAttribs(GLuint program, struct attrib_info attribs[])
 \end_layout
 
 \begin_layout Plain Layout
+
    GetProgramiv(program, GL_ACTIVE_ATTRIBUTES, &n);
 \end_layout
 
 \begin_layout Plain Layout
+
    GetProgramiv(program, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &max);
 \end_layout
 
@@ -6367,18 +7351,22 @@ GetAttribs(GLuint program, struct attrib_info attribs[])
 \end_layout
 
 \begin_layout Plain Layout
+
    for (i = 0; i < n; i++) {
 \end_layout
 
 \begin_layout Plain Layout
+
       GLint size, len;
 \end_layout
 
 \begin_layout Plain Layout
+
       GLenum type;
 \end_layout
 
 \begin_layout Plain Layout
+
       char name[100];
 \end_layout
 
@@ -6387,6 +7375,7 @@ GetAttribs(GLuint program, struct attrib_info attribs[])
 \end_layout
 
 \begin_layout Plain Layout
+
       GetActiveAttrib(program, i, 100, &len, &size, &type, name);
 \end_layout
 
@@ -6395,22 +7384,27 @@ GetAttribs(GLuint program, struct attrib_info attribs[])
 \end_layout
 
 \begin_layout Plain Layout
+
       attribs[i].name = strdup(name);
 \end_layout
 
 \begin_layout Plain Layout
+
       attribs[i].size = size;
 \end_layout
 
 \begin_layout Plain Layout
+
       attribs[i].type = type;
 \end_layout
 
 \begin_layout Plain Layout
+
       attribs[i].location = GetAttribLocation(program, name);
 \end_layout
 
 \begin_layout Plain Layout
+
    }
 \end_layout
 
@@ -6419,6 +7413,7 @@ GetAttribs(GLuint program, struct attrib_info attribs[])
 \end_layout
 
 \begin_layout Plain Layout
+
    attribs[i].name = NULL; /* end of list */
 \end_layout
 
@@ -6427,10 +7422,12 @@ GetAttribs(GLuint program, struct attrib_info attribs[])
 \end_layout
 
 \begin_layout Plain Layout
+
    return n;
 \end_layout
 
 \begin_layout Plain Layout
+
 }
 \end_layout
 
@@ -6443,18 +7440,22 @@ GetAttribs(GLuint program, struct attrib_info attribs[])
 \end_layout
 
 \begin_layout Plain Layout
+
 void
 \end_layout
 
 \begin_layout Plain Layout
+
 PrintAttribs(const struct attrib_info attribs[])
 \end_layout
 
 \begin_layout Plain Layout
+
 {
 \end_layout
 
 \begin_layout Plain Layout
+
    GLint i;
 \end_layout
 
@@ -6463,6 +7464,7 @@ PrintAttribs(const struct attrib_info attribs[])
 \end_layout
 
 \begin_layout Plain Layout
+
    printf("Attribs:
 \backslash
 n");
@@ -6473,40 +7475,49 @@ n");
 \end_layout
 
 \begin_layout Plain Layout
+
    for (i = 0; attribs[i].name; i++) {
 \end_layout
 
 \begin_layout Plain Layout
+
       printf("  %d: %s size=%d type=0x%x loc=%d
 \backslash
 n",
 \end_layout
 
 \begin_layout Plain Layout
+
              i,
 \end_layout
 
 \begin_layout Plain Layout
+
              attribs[i].name,
 \end_layout
 
 \begin_layout Plain Layout
+
              attribs[i].size,
 \end_layout
 
 \begin_layout Plain Layout
+
              attribs[i].type,
 \end_layout
 
 \begin_layout Plain Layout
+
              attribs[i].location);
 \end_layout
 
 \begin_layout Plain Layout
+
    }
 \end_layout
 
 \begin_layout Plain Layout
+
 }
 \end_layout
 
@@ -6529,10 +7540,12 @@ inline false
 status open
 
 \begin_layout Plain Layout
+
 #ifndef SHADER_UTIL_H
 \end_layout
 
 \begin_layout Plain Layout
+
 #define SHADER_UTIL_H
 \end_layout
 
@@ -6545,14 +7558,17 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
+
 #ifdef __cplusplus
 \end_layout
 
 \begin_layout Plain Layout
+
 extern "C" {
 \end_layout
 
 \begin_layout Plain Layout
+
 #endif
 \end_layout
 
@@ -6565,35 +7581,43 @@ extern "C" {
 \end_layout
 
 \begin_layout Plain Layout
+
 struct uniform_info
 \end_layout
 
 \begin_layout Plain Layout
+
 {
 \end_layout
 
 \begin_layout Plain Layout
+
    const char *name;
 \end_layout
 
 \begin_layout Plain Layout
+
    GLuint size;  /**< number of value[] elements: 1, 2, 3 or 4 */
 \end_layout
 
 \begin_layout Plain Layout
+
    GLenum type;  /**< GL_FLOAT, GL_FLOAT_VEC4, GL_INT, GL_FLOAT_MAT4, etc
  */
 \end_layout
 
 \begin_layout Plain Layout
+
    GLfloat value[16];
 \end_layout
 
 \begin_layout Plain Layout
+
    GLint location;  /**< filled in by InitUniforms() */
 \end_layout
 
 \begin_layout Plain Layout
+
 };
 \end_layout
 
@@ -6602,6 +7626,7 @@ struct uniform_info
 \end_layout
 
 \begin_layout Plain Layout
+
 #define END_OF_UNIFORMS   { NULL, 0, GL_NONE, { 0, 0, 0, 0 }, -1 }
 \end_layout
 
@@ -6614,30 +7639,37 @@ struct uniform_info
 \end_layout
 
 \begin_layout Plain Layout
+
 struct attrib_info
 \end_layout
 
 \begin_layout Plain Layout
+
 {
 \end_layout
 
 \begin_layout Plain Layout
+
    const char *name;
 \end_layout
 
 \begin_layout Plain Layout
+
    GLuint size;  /**< number of value[] elements: 1, 2, 3 or 4 */
 \end_layout
 
 \begin_layout Plain Layout
+
    GLenum type;  /**< GL_FLOAT, GL_FLOAT_VEC4, GL_INT, etc */
 \end_layout
 
 \begin_layout Plain Layout
+
    GLint location;
 \end_layout
 
 \begin_layout Plain Layout
+
 };
 \end_layout
 
@@ -6650,10 +7682,12 @@ struct attrib_info
 \end_layout
 
 \begin_layout Plain Layout
+
 extern GLboolean
 \end_layout
 
 \begin_layout Plain Layout
+
 ShadersSupported(void);
 \end_layout
 
@@ -6662,10 +7696,12 @@ ShadersSupported(void);
 \end_layout
 
 \begin_layout Plain Layout
+
 extern GLuint
 \end_layout
 
 \begin_layout Plain Layout
+
 CompileShaderText(GLenum shaderType, const char *text);
 \end_layout
 
@@ -6674,10 +7710,12 @@ CompileShaderText(GLenum shaderType, const char *text);
 \end_layout
 
 \begin_layout Plain Layout
+
 extern GLuint
 \end_layout
 
 \begin_layout Plain Layout
+
 CompileShaderFile(GLenum shaderType, const char *filename);
 \end_layout
 
@@ -6686,10 +7724,12 @@ CompileShaderFile(GLenum shaderType, const char *filename);
 \end_layout
 
 \begin_layout Plain Layout
+
 extern GLuint
 \end_layout
 
 \begin_layout Plain Layout
+
 LinkShaders(GLuint vertShader, GLuint fragShader);
 \end_layout
 
@@ -6698,10 +7738,12 @@ LinkShaders(GLuint vertShader, GLuint fragShader);
 \end_layout
 
 \begin_layout Plain Layout
+
 extern GLuint
 \end_layout
 
 \begin_layout Plain Layout
+
 LinkShaders3(GLuint vertShader, GLuint geomShader, GLuint fragShader);
 \end_layout
 
@@ -6710,15 +7752,18 @@ LinkShaders3(GLuint vertShader, GLuint geomShader, GLuint fragShader);
 \end_layout
 
 \begin_layout Plain Layout
+
 extern GLuint
 \end_layout
 
 \begin_layout Plain Layout
+
 LinkShaders3WithGeometryInfo(GLuint vertShader, GLuint geomShader, GLuint
  fragShader,
 \end_layout
 
 \begin_layout Plain Layout
+
                              GLint verticesOut, GLenum inputType, GLenum
  outputType);
 \end_layout
@@ -6728,10 +7773,12 @@ LinkShaders3WithGeometryInfo(GLuint vertShader, GLuint geomShader, GLuint
 \end_layout
 
 \begin_layout Plain Layout
+
 extern GLboolean
 \end_layout
 
 \begin_layout Plain Layout
+
 ValidateShaderProgram(GLuint program);
 \end_layout
 
@@ -6740,10 +7787,12 @@ ValidateShaderProgram(GLuint program);
 \end_layout
 
 \begin_layout Plain Layout
+
 extern GLdouble
 \end_layout
 
 \begin_layout Plain Layout
+
 GetShaderCompileTime(void);
 \end_layout
 
@@ -6752,10 +7801,12 @@ GetShaderCompileTime(void);
 \end_layout
 
 \begin_layout Plain Layout
+
 extern GLdouble
 \end_layout
 
 \begin_layout Plain Layout
+
 GetShaderLinkTime(void);
 \end_layout
 
@@ -6764,10 +7815,12 @@ GetShaderLinkTime(void);
 \end_layout
 
 \begin_layout Plain Layout
+
 extern void
 \end_layout
 
 \begin_layout Plain Layout
+
 SetUniformValues(GLuint program, struct uniform_info uniforms[]);
 \end_layout
 
@@ -6776,10 +7829,12 @@ SetUniformValues(GLuint program, struct uniform_info uniforms[]);
 \end_layout
 
 \begin_layout Plain Layout
+
 extern GLuint
 \end_layout
 
 \begin_layout Plain Layout
+
 GetUniforms(GLuint program, struct uniform_info uniforms[]);
 \end_layout
 
@@ -6788,10 +7843,12 @@ GetUniforms(GLuint program, struct uniform_info uniforms[]);
 \end_layout
 
 \begin_layout Plain Layout
+
 extern void
 \end_layout
 
 \begin_layout Plain Layout
+
 PrintUniforms(const struct uniform_info uniforms[]);
 \end_layout
 
@@ -6800,10 +7857,12 @@ PrintUniforms(const struct uniform_info uniforms[]);
 \end_layout
 
 \begin_layout Plain Layout
+
 extern GLuint
 \end_layout
 
 \begin_layout Plain Layout
+
 GetAttribs(GLuint program, struct attrib_info attribs[]);
 \end_layout
 
@@ -6812,10 +7871,12 @@ GetAttribs(GLuint program, struct attrib_info attribs[]);
 \end_layout
 
 \begin_layout Plain Layout
+
 extern void
 \end_layout
 
 \begin_layout Plain Layout
+
 PrintAttribs(const struct attrib_info attribs[]);
 \end_layout
 
@@ -6824,90 +7885,112 @@ PrintAttribs(const struct attrib_info attribs[]);
 \end_layout
 
 \begin_layout Plain Layout
+
 /* These pointers are only valid after calling ShadersSupported.
 \end_layout
 
 \begin_layout Plain Layout
+
  */
 \end_layout
 
 \begin_layout Plain Layout
+
 extern PFNGLCREATESHADERPROC CreateShader;
 \end_layout
 
 \begin_layout Plain Layout
+
 extern PFNGLDELETESHADERPROC DeleteShader;
 \end_layout
 
 \begin_layout Plain Layout
+
 extern PFNGLSHADERSOURCEPROC ShaderSource;
 \end_layout
 
 \begin_layout Plain Layout
+
 extern PFNGLGETSHADERIVPROC GetShaderiv;
 \end_layout
 
 \begin_layout Plain Layout
+
 extern PFNGLGETSHADERINFOLOGPROC GetShaderInfoLog;
 \end_layout
 
 \begin_layout Plain Layout
+
 extern PFNGLCREATEPROGRAMPROC CreateProgram;
 \end_layout
 
 \begin_layout Plain Layout
+
 extern PFNGLDELETEPROGRAMPROC DeleteProgram;
 \end_layout
 
 \begin_layout Plain Layout
+
 extern PFNGLATTACHSHADERPROC AttachShader;
 \end_layout
 
 \begin_layout Plain Layout
+
 extern PFNGLLINKPROGRAMPROC LinkProgram;
 \end_layout
 
 \begin_layout Plain Layout
+
 extern PFNGLUSEPROGRAMPROC UseProgram;
 \end_layout
 
 \begin_layout Plain Layout
+
 extern PFNGLGETPROGRAMIVPROC GetProgramiv;
 \end_layout
 
 \begin_layout Plain Layout
+
 extern PFNGLGETPROGRAMINFOLOGPROC GetProgramInfoLog;
 \end_layout
 
 \begin_layout Plain Layout
+
 extern PFNGLVALIDATEPROGRAMARBPROC ValidateProgramARB;
 \end_layout
 
 \begin_layout Plain Layout
+
 extern PFNGLUNIFORM1IPROC Uniform1i;
 \end_layout
 
 \begin_layout Plain Layout
+
 extern PFNGLUNIFORM1FVPROC Uniform1fv;
 \end_layout
 
 \begin_layout Plain Layout
+
 extern PFNGLUNIFORM2FVPROC Uniform2fv;
 \end_layout
 
 \begin_layout Plain Layout
+
 extern PFNGLUNIFORM3FVPROC Uniform3fv;
 \end_layout
 
 \begin_layout Plain Layout
+
 extern PFNGLUNIFORM4FVPROC Uniform4fv;
 \end_layout
 
 \begin_layout Plain Layout
+
 extern PFNGLGETACTIVEATTRIBPROC GetActiveAttrib;
 \end_layout
 
 \begin_layout Plain Layout
+
 extern PFNGLGETATTRIBLOCATIONPROC GetAttribLocation;
 \end_layout
 
@@ -6916,14 +7999,17 @@ extern PFNGLGETATTRIBLOCATIONPROC GetAttribLocation;
 \end_layout
 
 \begin_layout Plain Layout
+
 #ifdef __cplusplus
 \end_layout
 
 \begin_layout Plain Layout
+
 }
 \end_layout
 
 \begin_layout Plain Layout
+
 #endif
 \end_layout
 
@@ -6932,6 +8018,7 @@ extern PFNGLGETATTRIBLOCATIONPROC GetAttribLocation;
 \end_layout
 
 \begin_layout Plain Layout
+
 #endif /* SHADER_UTIL_H */
 \end_layout
 
