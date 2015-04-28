@@ -1,4 +1,4 @@
-!gfortran neumannFinal.f95 -fimplicit-none -O3 -o neumannFinal -fdefault-real-8 && time ./neumannFinal
+!gfortran neumannFinal4.f95 -fimplicit-none -O3 -o neumannFinal4 -fdefault-real-8 && time ./neumannFinal4
       
       FUNCTION F(X,Y,H)
         !the right side of the poisson equation
@@ -7,9 +7,9 @@
         REAL F
         REAL :: XC
         REAL :: YC
-        XC = (X-1)*H
-        YC = (Y-1)*H
-        !F=12-12*XC-12*YC
+        XC = (X-0.5)*H
+        YC = (Y-0.5)*H
+        !F=12-12*XC-12*YC                                                      !Switch which of these are commented out if you wish to use the other divergence function
         F=(6-12*XC)*(3*YC**2-2*YC**3) + (3*XC**2-2*XC**3)*(6-12*YC)
         RETURN
       END FUNCTION
@@ -22,9 +22,9 @@
         REAL :: H
         REAL :: XC
         REAL :: YC
-        XC = (X-1)*H
-        YC = (Y-1)*H
-        !ANALYTICAL = 3*XC**2 + 3*YC**2 - 2*XC**3 - 2*YC**3
+        XC = (X-0.5)*H
+        YC = (Y-0.5)*H
+        !ANALYTICAL = 3*XC**2 + 3*YC**2 - 2*XC**3 - 2*YC**3                   !Switch which of these are commented out if you wish to use the other divergence function
         ANALYTICAL = (3*YC**2 - 2*YC**3)*(3*XC**2 - 2*XC**3)
         RETURN
       END FUNCTION
@@ -40,37 +40,22 @@
         REAL NEWESTIMATE
         REAL SIMPLEESTIMATE
         REAL F
-        REAL :: ORIGINDEMAND
-        REAL :: TWO_ONE
-        REAL :: ONE_TWO
         IF (X==1 .AND. Y==1) THEN
-          TWO_ONE=(F(1,1,H)**2-2*PHIS(1,2))/2.0
-          ONE_TWO=(F(1,1,H)**2-2*PHIS(2,1))/2.0
-          PHIS(1,2)=ONE_TWO
-          PHIS(2,1)=TWO_ONE
-          NEWESTIMATE=0.0
-        ELSE IF (X==2 .AND. Y==2) THEN
-          TWO_ONE=(F(1,1,H)**2-2*PHIS(1,2))/2.0
-          ONE_TWO=(F(1,1,H)**2-2*PHIS(2,1))/2.0
-          NEWESTIMATE = (1.0/4.0)*(PHIS(X+1,Y)+PHIS(X,Y+1)+ONE_TWO+TWO_ONE-H*H*F(X,Y,H))
+          NEWESTIMATE = 0.0
         ELSE IF (X==1 .AND. Y==LENGTH) THEN
-          NEWESTIMATE = (PHIS(2,LENGTH-1) + PHIS(2,LENGTH) + PHIS(1,LENGTH-1))/3.0
+          NEWESTIMATE = (1.0/2.0)*(PHIS(X+1,Y)+PHIS(X,Y-1)-H*H*F(X,Y,H))
         ELSE IF (X==LENGTH .AND. Y==1) THEN
-          NEWESTIMATE = (PHIS(LENGTH-1,2) + PHIS(LENGTH,2) + PHIS(LENGTH-1,1))/3.0
+          NEWESTIMATE = (1.0/2.0)*(PHIS(X-1,Y)+PHIS(X,Y+1)-H*H*F(X,Y,H))
         ELSE IF (X==LENGTH .AND. Y==LENGTH) THEN
-          NEWESTIMATE = (PHIS(LENGTH-1,LENGTH-1) + PHIS(LENGTH-1,LENGTH) + PHIS(LENGTH,LENGTH-1))/3.0
+          NEWESTIMATE = (1.0/2.0)*(PHIS(X-1,Y)+PHIS(X,Y-1)-H*H*F(X,Y,H))
         ELSE IF (X==1) THEN
-          NEWVALUE = (1.0/4.0)*(2*PHIS(X+1,Y)+PHIS(X,Y+1)+PHIS(X,Y-1)-H*H*F(X,Y,H))
-          NEWESTIMATE = NEWVALUE
+          NEWESTIMATE = (1.0/3.0)*(PHIS(X,Y+1)+PHIS(X,Y-1)+PHIS(X+1,Y)-H*H*F(X,Y,H))
         ELSE IF (X==LENGTH) THEN
-          NEWVALUE = (1.0/4.0)*(PHIS(X,Y+1)+2*PHIS(X-1,Y)+PHIS(X,Y-1)-H*H*F(X,Y,H))
-          NEWESTIMATE = NEWVALUE
+          NEWESTIMATE = (1.0/3.0)*(PHIS(X,Y+1)+PHIS(X,Y-1)+PHIS(X-1,Y)-H*H*F(X,Y,H))
         ELSE IF (Y==1) THEN
-          NEWVALUE = (1.0/4.0)*(PHIS(X+1,Y)+2*PHIS(X,Y+1)+PHIS(X-1,Y)-H*H*F(X,Y,H))
-          NEWESTIMATE = NEWVALUE
+          NEWESTIMATE = (1.0/3.0)*(PHIS(X+1,Y)+PHIS(X-1,Y)+PHIS(X,Y+1)-H*H*F(X,Y,H))
         ELSE IF (Y==LENGTH) THEN
-          NEWVALUE = (1.0/4.0)*(PHIS(X+1,Y)+PHIS(X-1,Y)+2*PHIS(X,Y-1)-H*H*F(X,Y,H))
-          NEWESTIMATE = NEWVALUE
+          NEWESTIMATE = (1.0/3.0)*(PHIS(X+1,Y)+PHIS(X-1,Y)+PHIS(X,Y-1)-H*H*F(X,Y,H))
         ELSE
           NEWESTIMATE = SIMPLEESTIMATE(X,Y,H,PHIS,LENGTH)
         END IF
@@ -91,7 +76,7 @@
       END FUNCTION
       
       FUNCTION HIGHESTCHANGEFUN(OLD,NEW,PREVHIGHEST)
-        !returns the gighest change in (phi-)value given a new old value, new assignment and the previous highest change
+        !returns the Highest change in (phi-)value given a new old value, new assignment and the previous highest change
         REAL :: OLD
         REAL :: NEW
         REAL :: PREVHIGHEST
@@ -139,8 +124,8 @@
       END FUNCTION
       
       PROGRAM SOLVER
-        REAL, PARAMETER :: H = 0.0105
-        INTEGER, PARAMETER :: LENGTH = (1.0/H)+1
+        REAL, PARAMETER :: H = 0.01
+        INTEGER, PARAMETER :: LENGTH = (1.0/H)
         INTEGER, PARAMETER :: SIZE = LENGTH*LENGTH
         REAL :: PHIS(LENGTH, LENGTH)
         INTEGER, PARAMETER :: out_unit=20
@@ -167,18 +152,18 @@
         HIGHESTCHANGE = 10000.0
         
         WRITE (*,*) "LENGTH IS ", LENGTH
-        !a friendly reminder that the real coordinate is (x-1)*h, not x*h
-        WRITE (*,*) "(LENGTH-1)*H IS ", ((LENGTH-1)*H)
+        !a friendly reminder that the real coordinate is (x-0.5)*h, not x*h
+        WRITE (*,*) "(LENGTH-0.5)*H IS ", ((LENGTH-0.5)*H)
         
         DO I=1,LENGTH
           DO J=1,LENGTH
-            PHIS(I,J) = RAND(SEED)*10.0
+            PHIS(I,J) = RAND(SEED)*10.0 !SEED is intentionally uninitialized in the hope of providing some randomness. Sadly, no better solution was found.
           END DO
         END DO
         
         NUMITERATIONS = 0
         !the actual computation is performed here
-        DO WHILE      ((LOWHIGHESTCHANGE/HIGHESTCHANGE) > 1.1 .OR. (LOWAVGCHANGE/AVGCHANGE) > 1.000008)
+        DO WHILE  ((LOWHIGHESTCHANGE/HIGHESTCHANGE) > 1.0000126 .OR. (LOWAVGCHANGE/AVGCHANGE) > 1.0000365)
           NUMITERATIONS = NUMITERATIONS + 1
           LOWAVGCHANGE = LOWCHANGE(LOWAVGCHANGE, AVGCHANGE)
           LOWHIGHESTCHANGE = LOWCHANGE(LOWHIGHESTCHANGE, HIGHESTCHANGE)
